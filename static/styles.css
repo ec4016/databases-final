@@ -15,8 +15,14 @@ h1 {
     padding-bottom: 20px;
 }
 
+h2 {
+    font-size: 35px;
+    text-align: center;
+}
+
 h3 {
     font-size: 30px;
+    text-align: center;
 }
 
 a, p {
@@ -54,4 +60,41 @@ a, p {
     margin: 50px;
 }
 
+/* GUEST PAGE */
 
+.search-flights {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "one-way-section round-trip-section";
+    justify-content: space-between;
+    gap: 50px;
+}
+
+.one-way-section, .round-trip-section{
+    border: 1px solid black;
+    border-radius: 15px;
+}
+
+.one-way-filters {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "leaving-from going-to";
+    justify-items: center;
+}
+
+.round-trip-filters {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "leaving-from going-to";
+    justify-items: center;
+}
+
+.leaving-from {
+    justify-self: end;
+    padding-right: 20px;
+}
+
+.going-to {
+    justify-self: start;
+    padding-left: 20px;
+}
