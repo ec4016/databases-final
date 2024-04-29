@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel = "stylesheet" href="static\styles.css"/>
+        <title>Customer Register</title>
+    </head>
+
+    <body>
+        <div>
+			<h1>
+				<img id="cloud1" src="static\cloud.jpg" width="200px">
+				Customer Register
+				<img id="airplane" src="static\airplane.png" width="200px">
+			</h1>
+		</div>
+
+        <form action="/registerCustomerAuth" method="POST">
+            <input type="text" name="email" placeholder="Email" required/> </br>
+            <input type="password" name="password" placeholder="Password" required/></br>
+            <input type="text" name="fname" placeholder="First Name" required/> </br>
+            <input type="text" name="lname" placeholder="Last Name" required/> </br>
+            <input type="text" name="building_num" placeholder="Building Number" required/> </br>
+            <input type="text" name="street" placeholder="Street" required/> </br>
+            <input type="text" name="apartment_num" placeholder="Apartment Number" required/> </br>
+            <input type="text" name="city" placeholder="City" required/> </br>
+            <input type="text" name="state" placeholder="State" required/> </br>
+            <input type="text" name="zip_code" placeholder="Zip Code" required/> </br>
+            <input type="text" name="primary_phone_number" placeholder="Primary Phone Number" required/> </br>
+            <input type="text" name="passport_number" placeholder="Passport Number" required/> </br>
+            <input type="date" name="passport_expiration_date" placeholder="Passport Expiration Date" required/> </br>
+            <input type="text" name="passport_country" placeholder="Passport Country" required/> </br>
+            <input type="date" name="date_of_birth" placeholder="Date of Birth" required/> </br>
+            <input type="submit" value=Register/>
+
+            {% if error %}
+                <p class="error"><strong>Error:</strong> {{error}}</p>
+            {% endif %}
+        </form>
+        
+        <a href="/">Go Back</a><br>
+    </body>
+</html>

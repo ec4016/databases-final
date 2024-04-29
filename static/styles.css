@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
+
+body {
+    background-color: lightblue;
+    width: 80%;
+    font-family: Quicksand;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+h1 {
+    text-align: center;
+    font-size: 50px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+h3 {
+    font-size: 30px;
+}
+
+a, p {
+    font-size: 20px;
+    text-decoration: none;
+}
+
+
+/* HOME PAGE */
+#airplane {
+    margin-left: auto;
+}
+
+#homepage a:hover{
+    background-color: white;
+
+}
+
+.logins {
+    text-align: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "customer staff";
+    gap: 50px;
+}
+
+#customer, #staff {
+    border: 1px solid black;
+    border-radius: 15px;
+    padding-bottom: 10%;
+}
+
+#guest {
+    text-align: center;
+    margin: 50px;
+}
+
+

@@ -1,0 +1,28 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel = "stylesheet" href="static\styles.css"/>
+        <title>Staff Login</title>
+    </head>
+
+    <body>
+        <div>
+			<h1>
+				<img id="cloud1" src="static\cloud.jpg" width="200px">
+				Staff Login
+				<img id="airplane" src="static\airplane.png" width="200px">
+			</h1>
+		</div>
+
+        <form action="/loginStaffAuth" method="POST">
+            <input type="text" name = "username" placeholder="username" required/> </br>
+            <input type="password" name = "password" placeholder="password" required/></br>
+            <input type="submit" value = Login />
+            {% if error %}
+                <p class="error"><strong>Error:</strong> {{error}}</p>
+            {% endif %}
+        </form>
+
+        <a href="/">Go Back</a><br>
+    </body>
+</html>
