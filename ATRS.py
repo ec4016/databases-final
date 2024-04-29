@@ -171,6 +171,19 @@ def customer_flights():
     return render_template('customer_flights.html',flights=data)
 
 
+@app.route('/staff_view_flights')
+def staff_view_flights():
+    username = session['username']
+    cursor = conn.cursor()
+    query='SELECT flight_num, departure_date, departure_time, arrival_date, arrival_time, status, ' \
+          'airplane_id, departure_airport, arrival_airport'\
+          ' FROM flight NATURAL JOIN ticket NATURAL JOIN purchase' \
+          ' WHERE airline_name=%s'
+    cursor.execute(query, username)
+    data = cursor.fetchall()
+    cursor.close()
+    return render_template('staff_flights.html',flights=data)
+
 @app.route('/logout')
 def logout():
     session.pop('username')
