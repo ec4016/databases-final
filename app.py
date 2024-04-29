@@ -47,8 +47,8 @@ def guest():
 
 # -- CUSTOMER --
 #Authenticates the login
-@app.route('/loginCustomerAuth', methods=['GET', 'POST'])
-def loginAuth():
+@app.route('/customerLoginAuth', methods=['GET', 'POST'])
+def customerLoginAuth():
 	#grabs information from the forms
 	email = request.form['email']
 	password = request.form['password']
@@ -76,8 +76,8 @@ def loginAuth():
 		return render_template('customer_login.html', error=error)
 
 #Authenticates the register
-@app.route('/registerCustomerAuth', methods=['GET', 'POST'])
-def registerAuth():
+@app.route('/customerRegisterAuth', methods=['GET', 'POST'])
+def customerRegisterAuth():
 	#grabs information from the forms
 	email = request.form['email']
 	fname = request.form['fname']
@@ -120,8 +120,8 @@ def registerAuth():
 	
 # -- STAFF --
 #Authenticates the login
-@app.route('/loginStaffAuth', methods=['GET', 'POST'])
-def loginAuth():
+@app.route('/staffLoginAuth', methods=['GET', 'POST'])
+def staffLoginAuth():
 	#grabs information from the forms
 	username = request.form['username']
 	password = request.form['password']
@@ -149,8 +149,8 @@ def loginAuth():
 		return render_template('staff_login.html', error=error)
 
 #Authenticates the register
-@app.route('/registerStaffAuth', methods=['GET', 'POST'])
-def registerAuth():
+@app.route('/staffRegisterAuth', methods=['GET', 'POST'])
+def staffRegisterAuth():
 	#grabs information from the forms
 	username = request.form['username']
 	airline_name = request.form['airline_name']
