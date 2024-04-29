@@ -195,7 +195,7 @@ def staff_create_flights():
     arrival_time = request.form.get('arrival_time')
     base_price = request.form.get('base_price')
     status = request.form.get('status')
-    ariplane_id = request.form.get('airplane_id')
+    airplane_id = request.form.get('airplane_id')
     departure_airport = request.form.get('departure_airport')
     arrival_airport = request.form.get('arrival_airport')
 
@@ -208,7 +208,7 @@ def staff_create_flights():
         'arrival_time': arrival_time,
         'base_price': base_price,
         'status': status,
-        'airplane_id': airline_id,
+        'airplane_id': airplane_id,
         'departure_airport': departure_airport,
         'arrival_airport': arrival_airport
     }
