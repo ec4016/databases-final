@@ -1,0 +1,20 @@
+<html>
+<head>
+</head>
+<body>
+{% if not message %}
+<h1>Welcome {{username}}</h1>
+<a href="/customer_flights">My Flights</a>
+<a href="/flight_search">Flight Search</a>
+<a href="/track_spending">Track My Spending</a>
+<form action="/cust_add_num" method="POST">
+	<input type="text" name = "phonenumber" placeholder="Phone Number" required/> </br>
+	<input type="submit" value = Add />
+	{% if error %}
+		<p class="error"><strong>Error:</strong> {{error}}</p>
+	{% endif %}
+</form>
+<a href="/logout">Logout</a>
+{% endif %}
+</body>
+</html>
