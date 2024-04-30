@@ -109,7 +109,7 @@ date_of_birth DATE,
 airline_name varchar(30),
 departure_date date,
 departure_time time,
-PRIMARY KEY(ticket_id, flight_num),
+PRIMARY KEY(ticket_id),
 FOREIGN KEY(airline_name, flight_num, departure_date, departure_time) REFERENCES Flight(airline_name, flight_num, departure_date, departure_time)
 );
 
@@ -123,7 +123,7 @@ purchase_date DATE,
 purchase_time TIME,
 PRIMARY KEY(email, ticket_id),
 FOREIGN KEY(email) REFERENCES Customer(email),
-FOREIGN KEY(ticket_id) REFERENCES Ticket(ticket_id) 
+FOREIGN KEY(ticket_id) REFERENCES Ticket(ticket_id)
 );
 
 CREATE TABLE Customer_Phone_Numbers (

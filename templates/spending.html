@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <h1>Total Spendings:</h1>
+    <h2>you spent a total of {{total_spending}}$ in the last 6 months</h2>
+    <h2>Monthly Breakdown</h2>
+    <style type="text/css">
+	table, th, td{
+		border: 1px solid black;
+	}
+</style>
+<table>
+	<th>Month</th>
+	<th>Dollars Spent</th>
+
+{% for line in monthly %}
+	<tr>
+		<td>{{line['month']}}</td>
+		<td>{{line['month_spending']}}</td>
+	</tr>
+{% endfor %}
+</table>
+    <form action="/specific_spending" method="POST">
+        Start Date: <input type="date" name="start">
+        End Date: <input type="date" name="end">
+        <button type="submit">View Expenses</button>
+    </form>
+
+    <a href="home_customer">Go back</a>
+
+</head>
+<body>
+
+</body>
+</html>

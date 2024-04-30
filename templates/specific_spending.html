@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    {% if error %}
+    <p class="error"><strong>Error:</strong> {{error}}</p>
+    {% else %}
+    <h1>Total Spendings:</h1>
+    <h2>you spent a total of {{total_spending}}$ between {{start}} and {{end}}</h2>
+    <h2>Monthly Breakdown</h2>
+    <style type="text/css">
+	table, th, td{
+		border: 1px solid black;
+	}
+</style>
+<table>
+	<th>Month</th>
+	<th>Dollars Spent</th>
+
+{% for line in monthly %}
+	<tr>
+		<td>{{line['month']}}</td>
+		<td>{{line['month_spending']}}</td>
+	</tr>
+{% endfor %}
+</table>
+    {% endif %}
+    <a href="home_customer">Go back</a>
+
+</head>
+<body>
+
+</body>
+</html>
