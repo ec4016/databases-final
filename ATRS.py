@@ -258,12 +258,12 @@ def spending():
 @app.route('/specific_spending', methods=['GET', 'POST'])
 def specific_spending():
     username = session['username']
-    start=request.form['start']
-    end=request.form['end']
+    start = request.form['start']
+    end = request.form['end']
     query = "SELECT SUM(sold_price) AS total_spending FROM purchase NATURAL JOIN ticket " \
             "WHERE email = %s AND purchase_date BETWEEN %s AND %s"
     cursor = conn.cursor()
-    cursor.execute(query, (username,start,end))
+    cursor.execute(query, (username, start, end))
     data = cursor.fetchone()
     monthly = "SELECT DATE_FORMAT(purchase_date, '%%Y-%%m') AS month, SUM(sold_price) AS month_spending " \
               "FROM purchase NATURAL JOIN ticket " \
@@ -275,169 +275,147 @@ def specific_spending():
     cursor.close()
     start_date = datetime.strptime(start, '%Y-%m-%d')
     end_date = datetime.strptime(end, '%Y-%m-%d')
-    error=None
-    if(end_date<start_date):
-        error="Invalid Start and End Date"
+    error = None
+    if (end_date < start_date):
+        error = "Invalid Start and End Date"
         return render_template('specific_spending.html', error=error)
     num_months = (end_date.year - start_date.year) * 12 + end_date.month - start_date.month + 1
     months = [(start_date + timedelta(days=30 * i)).strftime('%Y-%m') for i in range(num_months)]
     spending_data = {d['month']: d['month_spending'] for d in monthlydata}
     results = [{'month': month, 'month_spending': spending_data.get(month, 0)} for month in months]
     if (data['total_spending'] != None):
-        return render_template('specific_spending.html',total_spending=data['total_spending'],start=start,end=end,monthly=results)
+        return render_template('specific_spending.html', total_spending=data['total_spending'], start=start, end=end,
+                               monthly=results)
     else:
-        return render_template('specific_spending.html',total_spending=0,start=start,end=end,monthly=results)
+        return render_template('specific_spending.html', total_spending=0, start=start, end=end, monthly=results)
 
-@app.route('/staff_new_flight', methods=['POST'])
-def staff_new_flight():
-    print(request.form)
-    airline_name = request.form.get('airline_name')
-    flight_num = request.form.get('flight_num')
-    departure_date = request.form.get('departure_date')
-    departure_time = request.form.get('departure_time')
-    arrival_date = request.form.get('arrival_date')
-    arrival_time = request.form.get('arrival_time')
-    base_price = request.form.get('base_price')
-    status = request.form.get('status')
-    airplane_id = request.form.get('airplane_id')
-    departure_airport = request.form.get('departure_airport')
-    arrival_airport = request.form.get('arrival_airport')
 
-    data = {
-        'airline_name': airline_name,
-        'flight_num' : flight_num,
-        'departure_date': departure_date,
-        'departure_time': departure_time,
-        'arrival_date': arrival_date,
-        'arrival_time': arrival_time,
-        'base_price': base_price,
-        'status': status,
-        'airplane_id': airplane_id,
-        'departure_airport': departure_airport,
-        'arrival_airport': arrival_airport
-    }
-    
+@app.route('/rating', methods=['GET'])
+def rating():
+    username = session['username']
+    query = 'SELECT * FROM flight_taken WHERE email=%s'
+    cursor = conn.cursor()
+    cursor.execute(query, username)
+    flights = cursor.fetchall()
+    cursor.close()
+    flight_error = None
+    if (flights):
+        return render_template('rating.html', flights=flights)
+    else:
+        flight_error = "You Have Not Taken Any Flights"
+        return render_template('rating.html', flight_error=flight_error)
+
+
+@app.route('/rate', methods=['POST'])
+def rate():
     username = session['username']
     cursor = conn.cursor()
-
-    error = None
-    if(data):
-        ins="INSERT INTO flight (airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, base_price, status, airplane_id, departure_airport, arrival_airport) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        cursor.execute(ins, (airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, base_price, status, airplane_id, departure_airport, arrival_airport))
-        conn.commit()
-        cursor.close()
-    
-    else:
-        error = "Data inputted incorrectly."
-        return render_template('staff_new_flight.html', error=error)
-
-@app.route('/change_flight_status', methods=['GET'])
-def change_flight_status():
-    print(request.args)
-    status = request.args.get('status')
-
-    username = session['username']
+    airline = request.form['airline_name']
     flight_num = request.form['flight_num']
+    date = request.form['departure_date']
+    time = request.form['departure_time']
+    print(time)
+    rating = request.form['rating']
+    comment = request.form['comment']
+    find = "SELECT * FROM flight_taken WHERE airline_name=%s AND flight_num=%s " \
+           "AND departure_date=%s AND TIME_FORMAT(departure_time, '%%H') = TIME_FORMAT(%s, '%%H') AND email=%s"
+    cursor.execute(find, (airline, flight_num, date, time, username))
+    exist = cursor.fetchone()
+    print(exist)
+    rating_error = None
+    query = 'SELECT * FROM flight_taken WHERE email=%s'
     cursor = conn.cursor()
-    query = 'SELECT flight_num FROM flight WHERE flight_num=%s'
-    cursor.execute(query, (username, flight_num))
-    data = cursor.fetchone()
-    change_error = None
-    
-    #cursor.execute(flights, username)
-    flightdata = cursor.fetchall()
-    if (data):
-        time_query = 'SELECT departure_date, departure_time FROM ticket WHERE ticket_id=%s'
-        cursor.execute(time_query, flight_num)
-        timedata = cursor.fetchone()
-        date = timedata['departure_date']
-        time = (datetime.min + timedata['departure_time']).time()
-
-        print(type(date), type(time))
-        print(time)
-        departure_date_time = datetime.combine(date, time)
-        now = datetime.now()
-        if ((departure_date_time - now) > timedelta(hours=0)):
-            update = "UPDATE Flight SET status=%s" \
-                     "WHERE flight_num=%s"
-            cursor.execute(update, flight_num)
-            conn.commit()
-            cursor.close()
-        else:
-            change_error = "Flight has already taken off"
-            return render_template('', change_error=change_error, username=username,
-                                   flights=flightdata)
-    else:
-        change_error = "Flight does not exist."
-        return render_template('', change_error=change_error, username=username, flights=flightdata)
-
-@app.route('/staff_new_airplane', methods=['POST'])
-def staff_new_airplane():
-    print(request.form)
-    airline_name = request.form.get('airline_name')
-    airplane_id = request.form.get('airplane_id')
-    num_seats = request.form.get('num_seats')
-    manufacturer = request.form.get('manufacturer')
-    model_number = request.form.get('model_number')
-    manufacturing_date = request.form.get('manufacturing_date')
-    age = request.form.get('age')
-
-    data = {
-        'airline_name': airline_name,
-        'airplane_id': airplane_id,
-        'num_seats': num_seats,
-        'manufacturer': manufacturer,
-        'model_number': model_number,
-        'manufacturing_date': manufacturing_date,
-        'age': age
-    }
-
-    username = session['username']
-    cursor = conn.cursor()
-
-    error = None
-    if(data):
-        ins="INSERT INTO flight (airline_name, airplane_id, num_seats, manufacturer, model_number, manufacturing_date, age) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-        cursor.execute(ins, (airline_name, airplane_id, num_seats, manufacturer, model_number, manufacturing_date, age))
+    cursor.execute(query, username)
+    flights = cursor.fetchall()
+    if (exist):
+        update = "UPDATE Flight_Taken SET rating = %s, comment = %s " \
+                 "WHERE email = %s AND airline_name = %s " \
+                 "AND flight_num = %s AND departure_date = %s " \
+                 "AND TIME_FORMAT(departure_time, '%%H') = TIME_FORMAT(%s, '%%H')"
+        cursor.execute(update, (rating, comment, username, airline, flight_num, date, time))
         conn.commit()
         cursor.close()
-    
+        return redirect(url_for('rating'))
     else:
-        error = "Data inputted incorrectly."
-        return render_template('staff_new_airplane.html', error=error)
-
-@app.route('/staff_new_airport', methods=['POST'])
-def staff_new_airport():
-    print(request.form)
-    code = request.form.get('code')
-    name = request.form.get('name')
-    city = request.form.get('city')
-    country = request.form.get('country')
-    num_terminals = request.form.get('num_terminals')
-    type = request.form.get('type')
-
-    data = {
-        'code': code,
-        'name': name,
-        'city': city,
-        'country': country,
-        'num_terminals': num_terminals,
-        'type': type
-    }
-
-    username = session['username']
-    cursor = conn.cursor()
-
-    error = None
-    if(data):
-        ins="INSERT INTO flight (code, name, city, country, num_terminals, type) VALUES (%s, %s, %s, %s, %s, %s)"
-        cursor.execute(ins, (code, name, city, country, num_terminals, type))
-        conn.commit()
         cursor.close()
-    
-    else:
-        error = "Data inputted incorrectly."
-        return render_template('staff_new_airport.html', error=error)
+        rating_error = "The Flight Does Not Exist or You Have Not Taken it"
+        return render_template('rating.html', flights=flights, rating_error=rating_error)
+
+
+@app.route('/search')
+def search():
+    return render_template('flight_search.html')
+
+
+@app.route('/flight_search', methods=['GET', 'POST'])
+def flight_search():
+    cursor = conn.cursor()
+    params = request.form
+    error = None
+
+    query = 'SELECT f.airline_name, f.flight_num, f.departure_date, f.departure_time, ' \
+            'f.arrival_date, f.arrival_time, f.status, f.departure_airport, f.arrival_airport, ' \
+            'dep.city as departure_city, arr.city as arrival_city ' \
+            'FROM Flight f JOIN Airport dep ON f.departure_airport = dep.code ' \
+            'JOIN Airport arr ON f.arrival_airport = arr.code where status != \'cancelled\' ' \
+            'AND ( departure_date > current_date OR ( departure_date = current_date AND departure_time > current_time ) )'
+
+    queries = []
+
+    if 'source_city' in params and params['source_city']:
+        query += ' AND dep.city = %s'
+    queries.append(params['source_city'])
+    if 'destination_city' in params and params['destination_city']:
+        query += ' AND arr.city = %s'
+    queries.append(params['destination_city'])
+    if 'source_airport' in params and params['source_airport']:
+        query += ' AND f.departure_airport = %s'
+    queries.append(params['source_airport'])
+    if 'destination_airport' in params and params['destination_airport']:
+        query += ' AND f.arrival_airport = %s'
+    queries.append(params['destination_airport'])
+    if 'departure_date' in params and params['departure_date']:
+        query += ' AND f.departure_date = %s'
+    queries.append(params['departure_date'])
+    # print(query)
+    cursor.execute(query, queries)
+    data = cursor.fetchall()
+
+    if not data:
+        error = "There are no flights matching these parameters. Please try again"
+    return render_template('flight_search.html', error=error)
+
+    return_data = None
+
+    if 'return_date' in params:  # I assume a return date means the user wants to come back to the airport from which they departed
+        return_query = 'SELECT f.airline_name, f.flight_num, f.departure_date, f.departure_time, f.arrival_date, f.arrival_time, f.status, f.departure_airport, f.arrival_airport, dep.city as departure_city, arr.city as arrival_city FROM Flight f JOIN Airport dep ON f.departure_airport = dep.code JOIN Airport arr ON f.arrival_airport = arr.code where status != \'cancelled\' AND ( departure_date > current_date OR ( departure_date = current_date AND departure_time > current_time ) )'
+
+    return_queries = []
+
+    if 'source_city' in params and params['source_city']:
+        return_query += ' AND arr.city = %s'
+    return_queries.append(params['source_city'])
+    if 'destination_city' in params and params['destination_city']:
+        return_query += ' AND dep.city = %s'
+    return_queries.append(params['destination_city'])
+    if 'source_airport' in params and params['source_airport']:
+        return_query += ' AND f.arrival_airport = %s'
+    return_queries.append(params['source_airport'])
+    if 'destination_airport' in params and params['destination_airport']:
+        return_query += ' AND f.departure_airport = %s'
+    return_queries.append(params['destination_airport'])
+
+    # Add condition for return date
+    return_query += ' AND f.departure_date = %s'
+    return_queries.append(params['return_date'])
+
+    # Execute the return query with parameters
+    cursor.execute(return_query, return_queries)
+    return_data = cursor.fetchall()
+    print(return_query, return_data)
+    cursor.close()
+    # print(data)
+    return render_template('flight_search.html', results=data, ret=return_data)
 
 
 @app.route('/logout')
