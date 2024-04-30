@@ -66,8 +66,20 @@ th, td {
 
 input {
     font-family: Quicksand;
+    border-radius: 15px;
+    padding: 10px;
+    background-color: white;
 }
 
+input[type=submit] {
+    background-color: lightgrey;
+    font-weight: 600;
+}
+
+input[type=submit]:hover {
+    background-color: skyblue;
+    font-weight: 600;
+}
 
 /* HOME PAGE */
 #airplane {
@@ -102,6 +114,7 @@ input {
     grid-template-areas: "one-way-section round-trip-section";
     justify-content: space-between;
     gap: 50px;
+    padding-bottom: 20px;
 }
 
 .one-way-section, .round-trip-section{
@@ -131,6 +144,21 @@ input {
 .going-to {
     justify-self: start;
     padding-left: 20px;
+}
+
+/* CUSTOMER/STAFF LOGIN */
+.login-credentials {
+    text-align: center;
+    border: 1px solid black;
+    border-radius: 15px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 25%;
+    padding: 20px;
+}
+
+.login-button {
+    margin-left: -27%;
 }
 
 /* CUSTOMER HOMEPAGE */

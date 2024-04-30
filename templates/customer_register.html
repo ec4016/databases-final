@@ -30,13 +30,13 @@
             <input type="date" name="passport_expiration_date" placeholder="Passport Expiration Date" required/> </br>
             <input type="text" name="passport_country" placeholder="Passport Country" required/> </br>
             <input type="date" name="date_of_birth" placeholder="Date of Birth" required/> </br>
-            <input type="submit" value=Register/>
+            <input type="submit" value="Register"/>
 
             {% if error %}
                 <p class="error"><strong>Error:</strong> {{error}}</p>
             {% endif %}
         </form>
         
-        <a href="/">Go Back</a><br>
+        <a id="back-button" href="/">Go Back</a><br>
     </body>
 </html>

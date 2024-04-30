@@ -265,6 +265,11 @@ def cust_add_num():
 	username = session['username']
 	number = request.form['phonenumber']
 	cursor = conn.cursor()
+
+	customer = 'SELECT first_name from customer where email=%s'
+	cursor.execute(customer, (username))
+	customerData = cursor.fetchone()
+
 	query = 'SELECT * FROM customer_phone_numbers WHERE email=%s AND phone_number=%s'
 	cursor.execute(query, (username, number))
 	data = cursor.fetchone()
@@ -277,13 +282,94 @@ def cust_add_num():
 	flightdata = cursor.fetchall()
 	if (data):
 		phone_error = "This number already exists"
-		return render_template('customer_home.html', phone_error=phone_error, username=username, flights=flightdata)
+		return render_template('customer_home.html', phone_error=phone_error, username=customerData['first_name'], flights=flightdata)
 	else:
 		ins = "INSERT INTO customer_phone_numbers (email, phone_number) VALUES (%s, %s)"
 		cursor.execute(ins, (username, number))
 		conn.commit()
 		cursor.close()
-		return render_template('customer_home.html', username=username, flights=flightdata)
+		return render_template('customer_home.html', username=customerData['first_name'], flights=flightdata)
+
+
+@app.route('/flight_search')
+def flight_search():
+	username = session['username']
+	cursor = conn.cursor()
+	customer = 'SELECT first_name from customer where email=%s'
+	cursor.execute(customer, (username))
+	customerData = cursor.fetchone()
+	fname = customerData['first_name']
+	return render_template('flight_search.html', username=fname)
+
+@app.route('/flightSearch', methods=['GET', 'POST'])
+def flightSearch():
+	username = session['username']
+	cursor = conn.cursor()
+	params = request.form
+	error = None
+
+	customer = 'SELECT first_name from customer where email=%s'
+	cursor.execute(customer, (username))
+	customerData = cursor.fetchone()
+	fname = customerData['first_name']
+
+	query = 'SELECT f.airline_name, f.flight_num, f.departure_date, f.departure_time, f.arrival_date, f.arrival_time, f.status, f.departure_airport, f.arrival_airport, dep.city as departure_city, arr.city as arrival_city FROM Flight f JOIN Airport dep ON f.departure_airport = dep.code JOIN Airport arr ON f.arrival_airport = arr.code where status != \'cancelled\' AND ( departure_date > current_date OR ( departure_date = current_date AND departure_time > current_time ) )' 
+
+	queries = []
+
+	if 'source_city' in params and params['source_city']:
+		query += ' AND dep.city = %s'
+		queries.append(params['source_city'])
+	if 'destination_city' in params and params['destination_city']:
+		query += ' AND arr.city = %s'
+		queries.append(params['destination_city'])
+	if 'source_airport' in params and params['source_airport']:
+		query += ' AND f.departure_airport = %s'
+		queries.append(params['source_airport'])
+	if 'destination_airport' in params and params['destination_airport']:
+		query += ' AND f.arrival_airport = %s'
+		queries.append(params['destination_airport'])
+	if 'departure_date' in params and params['departure_date']:
+		query += ' AND f.departure_date = %s'
+		queries.append(params['departure_date'])
+
+	cursor.execute(query, queries)
+	data = cursor.fetchall()
+
+
+	if not data:
+		error = "There are no flights matching these parameters. Please try again"
+		return render_template('flight_search.html', error=error)
+
+	return_data = None
+
+	if 'return_date' in params:
+		return_query = 'SELECT f.airline_name, f.flight_num, f.departure_date, f.departure_time, f.arrival_date, f.arrival_time, f.status, f.departure_airport, f.arrival_airport, dep.city as departure_city, arr.city as arrival_city FROM Flight f JOIN Airport dep ON f.departure_airport = dep.code JOIN Airport arr ON f.arrival_airport = arr.code where status != \'cancelled\' AND ( departure_date > current_date OR ( departure_date = current_date AND departure_time > current_time ) )' 
+
+		return_queries = []
+
+		if 'source_city' in params and params['source_city']:
+			return_query += ' AND arr.city = %s'
+			return_queries.append(params['source_city'])
+		if 'destination_city' in params and params['destination_city']:
+			return_query += ' AND dep.city = %s'
+			return_queries.append(params['destination_city'])
+		if 'source_airport' in params and params['source_airport']:
+			return_query += ' AND f.arrival_airport = %s'
+			return_queries.append(params['source_airport'])
+		if 'destination_airport' in params and params['destination_airport']:
+			return_query += ' AND f.departure_airport = %s'
+			return_queries.append(params['destination_airport'])
+		
+		# condition for return flight
+		return_query += ' AND f.departure_date = %s'
+		return_queries.append(params['return_date'])
+
+		cursor.execute(return_query, return_queries)
+		return_data = cursor.fetchall()
+		print(return_query, return_data)
+	cursor.close()
+	return render_template('flight_search.html', username=fname, results=data, ret=return_data)
 
 
 @app.route('/cancel_flight', methods=['POST'])
@@ -291,6 +377,11 @@ def cancel_flight():
 	username = session['username']
 	ticket_id = request.form['ticket_id']
 	cursor = conn.cursor()
+
+	customer = 'SELECT first_name from customer where email=%s'
+	cursor.execute(customer, (username))
+	customerData = cursor.fetchone()
+
 	query = 'SELECT email FROM purchase WHERE email=%s AND ticket_id=%s'
 	cursor.execute(query, (username, ticket_id))
 	data = cursor.fetchone()
@@ -324,7 +415,7 @@ def cancel_flight():
 								   flights=flightdata)
 	else:
 		cancel_error = "Ticket Does Not Exist or You do Not Own This Ticket"
-		return render_template('customer_home.html', cancel_error=cancel_error, username=username, flights=flightdata)
+		return render_template('customer_home.html', cancel_error=cancel_error, username=customerData['first_name'], flights=flightdata)
 
 
 @app.route('/spending', methods=['GET', 'POST'])

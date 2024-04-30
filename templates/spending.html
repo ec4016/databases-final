@@ -42,7 +42,7 @@
                 <form action="/specific_spending" method="POST">
                     Start Date: <input type="date" name="start" required>
                     End Date: <input type="date" name="end" required>
-                    <button type="submit">View Expenses</button>
+                    <input type="submit" value="View Expenses"/>
 
                     {% if error %}
                     <p class="error"><strong>Error:</strong> {{error}}</p>
@@ -52,6 +52,6 @@
             </div>
         </div>
         
-        <a href="customer_home">Go back</a>
+        <a id="back-button" href="customer_home">Go Back</a><br>
     <body>
 </html>
