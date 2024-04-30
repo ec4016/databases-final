@@ -64,67 +64,77 @@
             </div>
         </div>
         
-        {% if results %}
-        <table> 
-            <h3>Flights Ahead:</h3>
-            <th>Airline</th>
-            <th>Flight Number</th>
-            <th>Departure Date</th>
-            <th>Departure Time</th>
-            <th>Departure Airport</th>
-            <th>Departure City</th>
-            <th>Arrival Date</th>
-            <th>Arrival Time</th>
-            <th>Arrival Airport</th>
-            <th>Arrival City</th>
-            <th>Status</th>
+        <div class="flights-ahead">
+            {% if results %}
+            <table> 
+                <h3>Flights Ahead:</h3>
+                <th>Airline</th>
+                <th>Flight Number</th>
+                <th>Departure Date</th>
+                <th>Departure Time</th>
+                <th>Departure Airport</th>
+                <th>Departure City</th>
+                <th>Arrival Date</th>
+                <th>Arrival Time</th>
+                <th>Arrival Airport</th>
+                <th>Arrival City</th>
+                <th>Status</th>
 
-        {% for line in results %}
-            <tr>
-                <td>{{line['airline_name']}}</td>
-                <td>{{line['flight_num']}}</td>
-                <td>{{line['departure_date']}}</td>
-                <td>{{line['departure_time']}}</td>
-                <td>{{line['departure_airport']}}</td>
-                <td>{{line['departure_city']}}</td>
-                <td>{{line['arrival_date']}}</td>
-                <td>{{line['arrival_time']}}</td>
-                <td>{{line['arrival_airport']}}</td>
-                <td>{{line['arrival_city']}}</td>
-                <td>{{line['status']}}</td>
-            </tr>
-        {% endfor %}
-        </table>
-        {% endif %}
+                {% for line in results %}
+                <tr>
+                    <td>{{line['airline_name']}}</td>
+                    <td>{{line['flight_num']}}</td>
+                    <td>{{line['departure_date']}}</td>
+                    <td>{{line['departure_time']}}</td>
+                    <td>{{line['departure_airport']}}</td>
+                    <td>{{line['departure_city']}}</td>
+                    <td>{{line['arrival_date']}}</td>
+                    <td>{{line['arrival_time']}}</td>
+                    <td>{{line['arrival_airport']}}</td>
+                    <td>{{line['arrival_city']}}</td>
+                    <td>{{line['status']}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+        </div>
+        
 
-        {% if ret %}
-        <table> Return Flights
-            <th>Airline</th>
-            <th>Flight number</th>
-            <th>Departure time</th>
-            <th>Departure airport</th>
-            <th>Departure city</th>
-            <th>Arrival time</th>
-            <th>Arrival airport</th>
-            <th>Arrival city</th>
-            <th>Status</th>
+        <div class="return-flights">
+            {% if ret %}
+            <table> 
+                <h3>Return Flights:</h3>
+                <th>Airline</th>
+                <th>Flight Number</th>
+                <th>Departure Date</th>
+                <th>Departure Time</th>
+                <th>Departure Airport</th>
+                <th>Departure City</th>
+                <th>Arrival Date</th>
+                <th>Arrival Time</th>
+                <th>Arrival Airport</th>
+                <th>Arrival City</th>
+                <th>Status</th>
 
-
-        {% for line in ret %}
-            <tr>
-                <td>{{line['airline_name']}}</td>
-                <td>{{line['flight_num']}}</td>
-                <td>{{line['dep_timestamp']}}</td>
-                <td>{{line['dep_airport']}}</td>
-                <td>{{line['dep_city']}}</td>
-                <td>{{line['arr_timestamp']}}</td>
-                <td>{{line['arr_airport']}}</td>
-                <td>{{line['arr_city']}}</td>
-                <td>{{line['status']}}</td>
-            </tr>
-        {% endfor %}
-        </table> <br>
-        {% endif %}
+                {% for line in ret %}
+                <tr>
+                    <td>{{line['airline_name']}}</td>
+                    <td>{{line['flight_num']}}</td>
+                    <td>{{line['departure_date']}}</td>
+                    <td>{{line['departure_time']}}</td>
+                    <td>{{line['departure_airport']}}</td>
+                    <td>{{line['departure_city']}}</td>
+                    <td>{{line['arrival_date']}}</td>
+                    <td>{{line['arrival_time']}}</td>
+                    <td>{{line['arrival_airport']}}</td>
+                    <td>{{line['arrival_city']}}</td>
+                    <td>{{line['status']}}</td>
+                </tr>
+                {% endfor %}
+            </table> <br>
+            {% endif %}
+        </div>
+        
 
         {% if error %}
             <h3>Flights Ahead:</h3>

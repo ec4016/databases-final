@@ -187,6 +187,11 @@ input[type=submit]:hover {
     margin: 30px;
 }
 
+/* FLIGHT SEARCH */
+.flights-ahead, .return-flights {
+    margin-bottom: 20px;
+}
+
 /* spendings page */
 #spendings-container {
     text-align: center;
