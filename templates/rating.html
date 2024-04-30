@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+{% if flight_error %}
+<p class="error"><strong>Error:</strong> {{flight_error}}</p>
+{% else %}
+    <h1>Rate Your Past Flights</h1>
+<style type="text/css">
+	table, th, td{
+		border: 1px solid black;
+	}
+
+
+
+</style>
+<table>
+    <th>Airline</th>
+    <th>Flight Number</th>
+    <th>Departure Date</th>
+    <th>Departure Time</th>
+    <th>Rating</th>
+    <th>Comment</th>
+    {% for line in flights %}
+    <tr>
+        <td>{{line['airline_name']}}</td>
+        <td>{{line['flight_num']}}</td>
+        <td>{{line['departure_date']}}</td>
+        <td>{{line['departure_time']}}</td>
+        <th>{{line['rating']}}</th>
+        <th>{{line['comment']}}</th>
+    </tr>
+    {% endfor %}
+</table>
+<form action="/rate" method="POST">
+
+    <input type="text" name="airline_name" placeholder="Airline Name" required/> </br>
+    <input type="text" name="flight_num" placeholder="Flight Number" required/> </br>
+    <input type="date" name="departure_date" required/> </br>
+    <input type="time" name="departure_time" required/> </br>
+    <label>
+        <input type="radio" name="rating" value="1" required/> 1
+    </label></br>
+    <label>
+        <input type="radio" name="rating" value="2" required/> 2
+    </label></br>
+    <label>
+        <input type="radio" name="rating" value="3" required/> 3
+    </label></br>
+    <label>
+        <input type="radio" name="rating" value="4" required/> 4
+    </label></br>
+    <label>
+        <input type="radio" name="rating" value="5" required/> 5
+    </label></br>
+    <input type="text" name="comment" placeholder="comment" required/> </br>
+    <input type="submit" value=Rate>
+</form>
+{% if rating_error %}
+<p class="error"><strong>Error:</strong> {{rating_error}}</p>
+{% endif %}
+{% endif %}
+<a href="home_customer">Go back</a>
+</body>
+</html>

@@ -22,8 +22,8 @@
 {% endfor %}
 </table>
     <form action="/specific_spending" method="POST">
-        Start Date: <input type="date" name="start">
-        End Date: <input type="date" name="end">
+        Start Date: <input type="date" name="start" required>
+        End Date: <input type="date" name="end"required>
         <button type="submit">View Expenses</button>
     </form>
 

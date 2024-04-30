@@ -1,10 +1,136 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel = "stylesheet" href="static\styles.css"/>
+        <title>Flight Search</title>
+    </head>
 
-</body>
+    <body>
+        <div>
+			<h1>
+				<img id="cloud1" src="static\cloud.jpg" width="200px">
+				Welcome {{username}}!
+				<img id="airplane" src="static\airplane.png" width="200px">
+			</h1>
+		</div>
+
+        <div class="search-flights">
+            <div class="one-way-section">
+                <form action="/flight_search" method="POST">
+                    <h2>Search for One-Way Flights</h2>
+                    <h3>Filters:</h3>
+                    <div class="one-way-filters">
+                        <div class="leaving-from">
+                            <h4>Leaving From:</h4>
+                            <input type="text" name = "source_city" placeholder="Departure City"/></br>
+                            <input type="text" name = "source_airport" placeholder="Departure Airport"/></br>
+                            <input type="text" name = "departure_date" placeholder="Departure Date"/></br></br>
+                            <input type="submit" value = "Search"/><br><br>
+                        </div>
+
+                        <div class="going-to">
+                            <h4>Going To:</h4>
+                            <input type="text" name = "destination_city" placeholder="Arrival City"/></br>
+                            <input type="text" name = "destination_airport" placeholder="Arrival Airport"/></br>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="round-trip-section">
+                <form action="/flight_search" method="POST">
+                    <h2>Search for Round-Trip Flights</h2>
+                    <h3>Filters:</h3>
+                    <div class="round-trip-filters">
+                        <div class="leaving-from">
+                            <h4>Leaving From:</h4>
+                            <input type="text" name = "source_city" placeholder="Departure City"/></br>
+                            <input type="text" name = "source_airport" placeholder="Departure Airport"/></br>
+                            <input type="text" name = "departure_date" placeholder="Departure Date"/></br></br>
+                            <input type="submit" value = "Search"/><br><br>
+                        </div>
+
+                        <div class="going-to">
+                            <h4>Going To:</h4>
+                            <input type="text" name = "destination_city" placeholder="Arrival City"/></br>
+                            <input type="text" name = "destination_airport" placeholder="Arrival Airport"/></br>
+                            <input type="text" name = "return_date" placeholder="Return Date"/></br>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% if results %}
+        <table>
+            <h3>Flights Ahead:</h3>
+            <th>Airline</th>
+            <th>Flight Number</th>
+            <th>Departure Date</th>
+            <th>Departure Time</th>
+            <th>Departure Airport</th>
+            <th>Departure City</th>
+            <th>Arrival Date</th>
+            <th>Arrival Time</th>
+            <th>Arrival Airport</th>
+            <th>Arrival City</th>
+            <th>Status</th>
+
+        {% for line in results %}
+            <tr>
+                <td>{{line['airline_name']}}</td>
+                <td>{{line['flight_num']}}</td>
+                <td>{{line['departure_date']}}</td>
+                <td>{{line['departure_time']}}</td>
+                <td>{{line['departure_airport']}}</td>
+                <td>{{line['departure_city']}}</td>
+                <td>{{line['arrival_date']}}</td>
+                <td>{{line['arrival_time']}}</td>
+                <td>{{line['arrival_airport']}}</td>
+                <td>{{line['arrival_city']}}</td>
+                <td>{{line['status']}}</td>
+            </tr>
+        {% endfor %}
+        </table>
+        {% endif %}
+
+        {% if ret %}
+        <table> Return Flights
+            <th>Airline</th>
+            <th>Flight number</th>
+            <th>Departure time</th>
+            <th>Departure airport</th>
+            <th>Departure city</th>
+            <th>Arrival time</th>
+            <th>Arrival airport</th>
+            <th>Arrival city</th>
+            <th>Status</th>
+
+
+        {% for line in ret %}
+            <tr>
+                <td>{{line['airline_name']}}</td>
+                <td>{{line['flight_num']}}</td>
+                <td>{{line['dep_timestamp']}}</td>
+                <td>{{line['dep_airport']}}</td>
+                <td>{{line['dep_city']}}</td>
+                <td>{{line['arr_timestamp']}}</td>
+                <td>{{line['arr_airport']}}</td>
+                <td>{{line['arr_city']}}</td>
+                <td>{{line['status']}}</td>
+            </tr>
+        {% endfor %}
+        </table> <br>
+        {% endif %}
+
+        {% if error %}
+            <h3>Flights Ahead:</h3>
+            <div class="error"><strong>Error:</strong> {{error}}</div><br>
+        {% endif %}
+
+        <a id="back-button" href="home_customer">Go Back</a><br>
+    </body>
 </html>
