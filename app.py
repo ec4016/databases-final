@@ -1,34 +1,33 @@
-#Import Flask Library
+# Import Flask Library
+import hashlib
+from datetime import datetime, timedelta
 from flask import Flask, render_template, request, session, url_for, redirect
 import pymysql.cursors
-import hashlib
 
-#Initialize the app from Flask
+# Initialize the app from Flask
 app = Flask(__name__)
 
-#Configure MySQL
+# Configure MySQL
 conn = pymysql.connect(host='localhost',
 					   user='root',
 					   password='',
-					   db='air_ticket_reservation_system', # database name
+					   db='air_ticket_reservation_system',
 					   charset='utf8mb4',
 					   cursorclass=pymysql.cursors.DictCursor)
 
-#Define a route to hello function
+
 @app.route('/')
-def hello():
+def index():
 	return render_template('index.html')
 
 
-# -- CUSTOMER --
-#Define route for login
 @app.route('/customer_login')
-def customer_login():
+def login_customer():
 	return render_template('customer_login.html')
 
-#Authenticates the login
+
 @app.route('/customerLoginAuth', methods=['POST'])
-def custLoginAuth():
+def cust_loginAuth():
 	username = request.form['email']
 	password = request.form['password']
 	hashed_password = hashlib.md5(password.encode()).hexdigest()
@@ -40,10 +39,49 @@ def custLoginAuth():
 	cursor.close()
 	if (data):
 		session['username'] = username
-		return render_template('customer.html', error=error)
+		return redirect(url_for('customer_home'))
 	else:
 		error = 'Invalid login or username'
 		return render_template('customer_login.html', error=error)
+
+
+# -- STAFF --
+#Define route for login
+@app.route('/staff_login')
+def staff_login():
+	return render_template('staff_login.html')
+
+#Authenticates the login
+@app.route('/staffLoginAuth', methods=['POST'])
+def staffLoginAuth():
+	username = request.form['username']
+	password = request.form['password']
+	hashed_password = hashlib.md5(password.encode()).hexdigest()
+	cursor = conn.cursor()
+	query = "SELECT * FROM staff WHERE username = %s AND password = %s"
+	cursor.execute(query, (username, hashed_password))
+	data = cursor.fetchone()
+	cursor.close()
+	error = None
+	if (data):
+		session['username'] = username
+		return render_template('home_staff.html', error=error)
+	else:
+		error = 'Invalid login or username'
+		return render_template('staff_login.html', error=error)
+
+
+#Define route for register
+@app.route('/staff_register')
+def staff_register():
+	return render_template('staff_register.html')
+
+
+
+
+@app.route('/register_customer')
+def register_customer():
+	return render_template('register_customer.html')
 
 
 #Define route for register
@@ -84,37 +122,7 @@ def custRegisterAuth():
 		conn.commit()
 		cursor.close()
 		return render_template('index.html')
-	
-# -- STAFF --
-#Define route for login
-@app.route('/staff_login')
-def staff_login():
-	return render_template('staff_login.html')
 
-#Authenticates the login
-@app.route('/staffLoginAuth', methods=['POST'])
-def staffLoginAuth():
-	username = request.form['username']
-	password = request.form['password']
-	hashed_password = hashlib.md5(password.encode()).hexdigest()
-	cursor = conn.cursor()
-	query = "SELECT * FROM staff WHERE username = %s AND password = %s"
-	cursor.execute(query, (username, hashed_password))
-	data = cursor.fetchone()
-	cursor.close()
-	error = None
-	if (data):
-		session['username'] = username
-		return render_template('staff.html', error=error)
-	else:
-		error = 'Invalid login or username'
-		return render_template('staff_login.html', error=error)
-
-
-#Define route for register
-@app.route('/staff_register')
-def staff_register():
-	return render_template('staff_register.html')
 
 #Authenticates the register
 @app.route('/staffRegisterAuth', methods=['POST'])
@@ -156,9 +164,7 @@ def staffRegisterAuth():
 		cursor.close()
 		return render_template('index.html')
 	
-
-# -- GUEST --
-#Define route for guest
+# -- GUEST -- 
 @app.route('/guest')
 def guest():
 	return render_template('guest.html')
@@ -226,29 +232,174 @@ def guestView():
 	cursor.close()
 	return render_template('guest.html', results=data, ret=return_data)
 
-@app.route('/home')
-def home():
-	
+
+@app.route('/customer_home')
+def customer_home():
 	username = session['username']
 	cursor = conn.cursor();
-	query = 'SELECT ts, blog_post FROM blog WHERE username = %s ORDER BY ts DESC'
-	cursor.execute(query, (username))
-	data1 = cursor.fetchall() 
-	for each in data1:
-		print(each['blog_post'])
+	customer = 'SELECT first_name from customer where email=%s'
+	cursor.execute(customer, (username))
+	customerData = cursor.fetchone()
+	query = 'SELECT ticket_id, airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, status, ' \
+			'airplane_id, departure_airport, arrival_airport, sold_price, first_name, last_name' \
+			' FROM flight NATURAL JOIN ticket NATURAL JOIN purchase' \
+			' WHERE email=%s'
+	cursor.execute(query, username)
+	data = cursor.fetchall()
 	cursor.close()
-	return render_template('home.html', username=username, posts=data1)
+	return render_template('customer_home.html', username=customerData['first_name'], flights=data)
 
-		
+@app.route('/home_staff')
+def home_staff():
+	username = session['username']
+	cursor = conn.cursor();
+	query = 'SELECT first_name from staff where username = %s'
+	cursor.execute(query, username)
+	data = cursor.fetchall()
+	cursor.close()
+	return render_template('customer_home.html', username=username, flights=data)
+
+
+@app.route('/cust_add_num', methods=['POST'])
+def cust_add_num():
+	username = session['username']
+	number = request.form['phonenumber']
+	cursor = conn.cursor()
+	query = 'SELECT * FROM customer_phone_numbers WHERE email=%s AND phone_number=%s'
+	cursor.execute(query, (username, number))
+	data = cursor.fetchone()
+	phone_error = None
+	flights = 'SELECT ticket_id, airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, status, ' \
+			  'airplane_id, departure_airport, arrival_airport, sold_price, first_name, last_name' \
+			  ' FROM flight NATURAL JOIN ticket NATURAL JOIN purchase' \
+			  ' WHERE email=%s'
+	cursor.execute(flights, username)
+	flightdata = cursor.fetchall()
+	if (data):
+		phone_error = "This number already exists"
+		return render_template('customer_home.html', phone_error=phone_error, username=username, flights=flightdata)
+	else:
+		ins = "INSERT INTO customer_phone_numbers (email, phone_number) VALUES (%s, %s)"
+		cursor.execute(ins, (username, number))
+		conn.commit()
+		cursor.close()
+		return render_template('customer_home.html', username=username, flights=flightdata)
+
+
+@app.route('/cancel_flight', methods=['POST'])
+def cancel_flight():
+	username = session['username']
+	ticket_id = request.form['ticket_id']
+	cursor = conn.cursor()
+	query = 'SELECT email FROM purchase WHERE email=%s AND ticket_id=%s'
+	cursor.execute(query, (username, ticket_id))
+	data = cursor.fetchone()
+	cancel_error = None
+	flights = 'SELECT ticket_id, airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, status, ' \
+			  'airplane_id, departure_airport, arrival_airport, sold_price, first_name, last_name' \
+			  ' FROM flight NATURAL JOIN ticket NATURAL JOIN purchase' \
+			  ' WHERE email=%s ORDER BY departure_date DESC'
+	cursor.execute(flights, username)
+	flightdata = cursor.fetchall()
+	if (data):
+		time_query = 'SELECT departure_date, departure_time FROM ticket WHERE ticket_id=%s'
+		cursor.execute(time_query, ticket_id)
+		timedata = cursor.fetchone()
+		date = timedata['departure_date']
+		time = (datetime.min + timedata['departure_time']).time()
+
+		print(type(date), type(time))
+		print(time)
+		departure_date_time = datetime.combine(date, time)
+		now = datetime.now()
+		if ((departure_date_time - now) > timedelta(hours=24)):
+			update = "UPDATE Ticket SET sold_price = NULL, first_name = NULL,last_name = NULL, date_of_birth = NULL" \
+					 "WHERE ticket_id=%s"
+			cursor.execute(update, ticket_id)
+			conn.commit()
+			cursor.close()
+		else:
+			cancel_error = "Flight is Within 24 Hours, Cannot be Canceled"
+			return render_template('customer_home.html', cancel_error=cancel_error, username=username,
+								   flights=flightdata)
+	else:
+		cancel_error = "Ticket Does Not Exist or You do Not Own This Ticket"
+		return render_template('customer_home.html', cancel_error=cancel_error, username=username, flights=flightdata)
+
+
+@app.route('/spending', methods=['GET', 'POST'])
+def spending():
+	username = session['username']
+	query = "SELECT SUM(sold_price) AS total_spending FROM purchase NATURAL JOIN ticket " \
+			"WHERE email = %s AND purchase_date BETWEEN DATE_FORMAT(CURDATE() - INTERVAL 5 MONTH, '%%Y-%%m-01') AND CURDATE()"
+	cursor = conn.cursor()
+	cursor.execute(query, username)
+	data = cursor.fetchone()
+	monthly = "SELECT DATE_FORMAT(purchase_date, '%%Y-%%m') AS month, SUM(sold_price) AS month_spending " \
+			  "FROM purchase NATURAL JOIN ticket " \
+			  "WHERE email = %s AND purchase_date " \
+			  "BETWEEN DATE_FORMAT(CURDATE() - INTERVAL 5 MONTH, '%%Y-%%m-01') AND CURDATE() " \
+			  "GROUP BY month ORDER BY month ASC"
+	cursor.execute(monthly, username)
+	monthlydata = cursor.fetchall()
+	cursor.close()
+	months = [(datetime.today().replace(day=1) - timedelta(days=30 * i)).strftime('%Y-%m') for i in range(6)][::-1]
+	spending_data = {d['month']: d['month_spending'] for d in monthlydata}
+	results = [{'month': month, 'month_spending': spending_data.get(month, 0)} for month in months]
+	if (data['total_spending'] != None):
+		return render_template('spending.html', total_spending=data['total_spending'], monthly=results)
+	else:
+		return render_template('spending.html', total_spending=0, monthly=results)
+
+
+@app.route('/specific_spending', methods=['GET', 'POST'])
+def specific_spending():
+	username = session['username']
+	start=request.form['start']
+	end=request.form['end']
+	specific = None
+	query = "SELECT SUM(sold_price) AS total_spending FROM purchase NATURAL JOIN ticket " \
+			"WHERE email = %s AND purchase_date BETWEEN %s AND %s"
+	cursor = conn.cursor()
+	cursor.execute(query, (username,start,end))
+	data = cursor.fetchone()
+	monthly = "SELECT DATE_FORMAT(purchase_date, '%%Y-%%m') AS month, SUM(sold_price) AS month_spending " \
+			  "FROM purchase NATURAL JOIN ticket " \
+			  "WHERE email = %s AND purchase_date " \
+			  "BETWEEN %s AND %s " \
+			  "GROUP BY month ORDER BY month ASC"
+	cursor.execute(monthly, (username, start, end))
+	monthlydata = cursor.fetchall()
+	cursor.close()
+	start_date = datetime.strptime(start, '%Y-%m-%d')
+	end_date = datetime.strptime(end, '%Y-%m-%d')
+	error=None
+	if(end_date<start_date):
+		error="Invalid Start and End Date"
+		return render_template('spending.html', error=error)
+	num_months = (end_date.year - start_date.year) * 12 + end_date.month - start_date.month + 1
+	months = [(start_date + timedelta(days=30 * i)).strftime('%Y-%m') for i in range(num_months)]
+	spending_data = {d['month']: d['month_spending'] for d in monthlydata}
+	results = [{'month': month, 'month_spending': spending_data.get(month, 0)} for month in months]
+	if start is None and end is None:
+		specific = False
+	else:
+		specific = True
+	if (data['total_spending'] != None):
+		return render_template('spending.html',total_spending=data['total_spending'],start=start,end=end,monthly=results, error=error, specific=specific)
+	else:
+		return render_template('spending.html',total_spending=0,start=start,end=end,monthly=results, error=error, specific=specific)
+
 
 @app.route('/logout')
 def logout():
 	session.pop('username')
 	return redirect('/')
-		
+
+
 app.secret_key = 'some key that you will never guess'
-#Run the app on localhost port 5000
-#debug = True -> you don't have to restart flask
-#for changes to go through, TURN OFF FOR PRODUCTION
+# Run the app on localhost port 5000
+# debug = True -> you don't have to restart flask
+# for changes to go through, TURN OFF FOR PRODUCTION
 if __name__ == "__main__":
-	app.run('127.0.0.1', 5000, debug = True)
+	app.run('127.0.0.1', 5000, debug=True)
