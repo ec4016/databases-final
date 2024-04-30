@@ -369,6 +369,35 @@ def staff_new_airplane():
 @app.route('/staff_new_airport', methods=['POST'])
 def staff_new_airport():
     print(request.form)
+    code = request.form.get('code')
+    name = request.form.get('name')
+    city = request.form.get('city')
+    country = request.form.get('country')
+    num_terminals = request.form.get('num_terminals')
+    type = request.form.get('type')
+
+    data = {
+        'code': code,
+        'name': name,
+        'city': city,
+        'country': country,
+        'num_terminals': num_terminals,
+        'type': type
+    }
+
+    username = session['username']
+    cursor = conn.cursor()
+
+    error = None
+    if(data):
+        ins="INSERT INTO flight (code, name, city, country, num_terminals, type) VALUES (%s, %s, %s, %s, %s, %s)"
+        cursor.execute(ins, (code, name, city, country, num_terminals, type))
+        conn.commit()
+        cursor.close()
+    
+    else:
+        error = "Data inputted incorrectly."
+        return render_template('staff_new_airport.html', error=error)
 
 @app.route('/logout')
 def logout():
