@@ -2,18 +2,68 @@
 <head>
 </head>
 <body>
-{% if not message %}
 <h1>Welcome {{username}}</h1>
-<a href="/customer_flights">My Flights</a>
-<a href="/flight_search">Flight Search</a>
-<a href="/track_spending">Track My Spending</a>
+{% if not message %}
 <form action="/cust_add_num" method="POST">
+	<h1>Add Phone Numbers</h1>
 	<input type="text" name = "phonenumber" placeholder="Phone Number" required/> </br>
 	<input type="submit" value = Add />
-	{% if error %}
-		<p class="error"><strong>Error:</strong> {{error}}</p>
+	{% if phone_error %}
+		<p class="error"><strong>Error:</strong> {{phone_error}}</p>
 	{% endif %}
 </form>
+
+<h1>My Flights</h1>
+<style type="text/css">
+	table, th, td{
+		border: 1px solid black;
+	}
+</style>
+<table>
+	<th>Ticket ID</th>
+	<th>Airline</th>
+	<th>Flight Number</th>
+	<th>Plane ID</th>
+	<th>Passenger First Name</th>
+	<th>Passenger Last Name</th>
+    <th>Departure Date</th>
+	<th>Departure Time</th>
+    <th>Arrival Date</th>
+	<th>Arrival Time</th>
+    <th>Departure Airport</th>
+	<th>Arrival Airport</th>
+    <th>Status</th>
+    <th>Price</th>
+
+{% for line in flights %}
+	<tr>
+		<td>{{line['ticket_id']}}</td>
+		<td>{{line['airline_name']}}</td>
+		<td>{{line['flight_num']}}</td>
+		<td>{{line['airplane_id']}}</td>
+		<td>{{line['first_name']}}</td>
+		<td>{{line['last_name']}}</td>
+		<td>{{line['departure_date']}}</td>
+		<td>{{line['departure_time']}}</td>
+		<td>{{line['arrival_date']}}</td>
+		<td>{{line['arrival_time']}}</td>
+		<td>{{line['departure_airport']}}</td>
+		<td>{{line['arrival_airport']}}</td>
+		<td>{{line['status']}}</td>
+		<td>{{line['sold_price']}}</td>
+	</tr>
+{% endfor %}
+</table>
+<h1>Cancel Flights</h1>
+<form action="/cancel_flight" method="POST">
+    <input type="text" name="ticket_id" placeholder="Ticket ID" required /> </br>
+    <input type="submit" value="Cancel Ticket" />
+    {% if cancel_error %}
+        <p class="error"><strong>Error:</strong> {{cancel_error}}</p>
+    {% endif %}
+</form>
+<a href="/flight_search">Flight Search</a>
+<a href="/spending">Track My Spending</a>
 <a href="/logout">Logout</a>
 {% endif %}
 </body>
