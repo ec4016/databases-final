@@ -417,6 +417,156 @@ def flight_search():
     # print(data)
     return render_template('flight_search.html', results=data, ret=return_data)
 
+@app.route('/staff_new_flight', methods=['POST'])
+def staff_new_flight():
+    print(request.form)
+    airline_name = request.form.get('airline_name')
+    flight_num = request.form.get('flight_num')
+    departure_date = request.form.get('departure_date')
+    departure_time = request.form.get('departure_time')
+    arrival_date = request.form.get('arrival_date')
+    arrival_time = request.form.get('arrival_time')
+    base_price = request.form.get('base_price')
+    status = request.form.get('status')
+    airplane_id = request.form.get('airplane_id')
+    departure_airport = request.form.get('departure_airport')
+    arrival_airport = request.form.get('arrival_airport')
+
+    data = {
+        'airline_name': airline_name,
+        'flight_num' : flight_num,
+        'departure_date': departure_date,
+        'departure_time': departure_time,
+        'arrival_date': arrival_date,
+        'arrival_time': arrival_time,
+        'base_price': base_price,
+        'status': status,
+        'airplane_id': airplane_id,
+        'departure_airport': departure_airport,
+        'arrival_airport': arrival_airport
+    }
+    
+    username = session['username']
+    cursor = conn.cursor()
+
+    error = None
+    if(data):
+        ins="INSERT INTO flight (airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, base_price, status, airplane_id, departure_airport, arrival_airport) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        cursor.execute(ins, (airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, base_price, status, airplane_id, departure_airport, arrival_airport))
+        conn.commit()
+        cursor.close()
+    
+    else:
+        error = "Data inputted incorrectly."
+        return render_template('staff_new_flight.html', error=error)
+
+@app.route('/change_flight_status', methods=['GET'])
+def change_flight_status():
+    print(request.args)
+    status = request.args.get('status')
+
+    username = session['username']
+    flight_num = request.form['flight_num']
+    cursor = conn.cursor()
+    query = 'SELECT flight_num FROM flight WHERE flight_num=%s'
+    cursor.execute(query, (username, flight_num))
+    data = cursor.fetchone()
+    change_error = None
+    
+    #cursor.execute(flights, username)
+    flightdata = cursor.fetchall()
+    if (data):
+        time_query = 'SELECT departure_date, departure_time FROM ticket WHERE ticket_id=%s'
+        cursor.execute(time_query, flight_num)
+        timedata = cursor.fetchone()
+        date = timedata['departure_date']
+        time = (datetime.min + timedata['departure_time']).time()
+
+        print(type(date), type(time))
+        print(time)
+        departure_date_time = datetime.combine(date, time)
+        now = datetime.now()
+        if ((departure_date_time - now) > timedelta(hours=0)):
+            update = "UPDATE Flight SET status=%s" \
+                     "WHERE flight_num=%s"
+            cursor.execute(update, flight_num)
+            conn.commit()
+            cursor.close()
+        else:
+            change_error = "Flight has already taken off"
+            return render_template('', change_error=change_error, username=username,
+                                   flights=flightdata)
+    else:
+        change_error = "Flight does not exist."
+        return render_template('', change_error=change_error, username=username, flights=flightdata)
+
+@app.route('/staff_new_airplane', methods=['POST'])
+def staff_new_airplane():
+    print(request.form)
+    airline_name = request.form.get('airline_name')
+    airplane_id = request.form.get('airplane_id')
+    num_seats = request.form.get('num_seats')
+    manufacturer = request.form.get('manufacturer')
+    model_number = request.form.get('model_number')
+    manufacturing_date = request.form.get('manufacturing_date')
+    age = request.form.get('age')
+
+    data = {
+        'airline_name': airline_name,
+        'airplane_id': airplane_id,
+        'num_seats': num_seats,
+        'manufacturer': manufacturer,
+        'model_number': model_number,
+        'manufacturing_date': manufacturing_date,
+        'age': age
+    }
+
+    username = session['username']
+    cursor = conn.cursor()
+
+    error = None
+    if(data):
+        ins="INSERT INTO flight (airline_name, airplane_id, num_seats, manufacturer, model_number, manufacturing_date, age) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        cursor.execute(ins, (airline_name, airplane_id, num_seats, manufacturer, model_number, manufacturing_date, age))
+        conn.commit()
+        cursor.close()
+    
+    else:
+        error = "Data inputted incorrectly."
+        return render_template('staff_new_airplane.html', error=error)
+
+@app.route('/staff_new_airport', methods=['POST'])
+def staff_new_airport():
+    print(request.form)
+    code = request.form.get('code')
+    name = request.form.get('name')
+    city = request.form.get('city')
+    country = request.form.get('country')
+    num_terminals = request.form.get('num_terminals')
+    type = request.form.get('type')
+
+    data = {
+        'code': code,
+        'name': name,
+        'city': city,
+        'country': country,
+        'num_terminals': num_terminals,
+        'type': type
+    }
+
+    username = session['username']
+    cursor = conn.cursor()
+
+    error = None
+    if(data):
+        ins="INSERT INTO flight (code, name, city, country, num_terminals, type) VALUES (%s, %s, %s, %s, %s, %s)"
+        cursor.execute(ins, (code, name, city, country, num_terminals, type))
+        conn.commit()
+        cursor.close()
+    
+    else:
+        error = "Data inputted incorrectly."
+        return render_template('staff_new_airport.html', error=error)
 
 @app.route('/logout')
 def logout():
