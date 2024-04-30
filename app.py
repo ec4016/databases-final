@@ -70,10 +70,7 @@ def custRegisterAuth():
 		error = "This user already exists"
 		return render_template('customer_register.html', error=error)
 	else:
-		ins = """INSERT INTO customer (email, first_name, last_name, password, building_num, 
-								 street, apartment_num, city, state, zip_code, primary_phone_number, passport_number, 
-								 passport_expiration_date, passport_country, date_of_birth)
-								 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+		ins = "INSERT INTO customer (email, first_name, last_name, password, building_num, street, apartment_num, city, state, zip_code, primary_phone_number, passport_number, passport_expiration_date, passport_country, date_of_birth) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 		hashed_password = hashlib.md5(request.form['password'].encode()).hexdigest()
 		cursor.execute(ins, (request.form['email'], request.form['first_name'], request.form['last_name'],
 							 hashed_password, request.form['building_num'], request.form['street'],
@@ -119,117 +116,10 @@ def staffLoginAuth():
 def staff_register():
 	return render_template('staff_register.html')
 
-@app.route('/guest')
-def guest():
-	return render_template('guest.html')
-
-# -- CUSTOMER --
-#Authenticates the login
-@app.route('/customerLoginAuth', methods=['GET', 'POST'])
-def customerLoginAuth():
-	#grabs information from the forms
-	email = request.form['email']
-	password = request.form['password']
-	hashed_password = md5(password.encode()).hexdigest()
-
-	#cursor used to send queries
-	cursor = conn.cursor()
-	#executes query
-	query = 'SELECT * FROM customer WHERE email = %s and password = %s'
-	cursor.execute(query, (email, hashed_password))
-	#stores the results in a variable
-	print(hashed_password)
-	data = cursor.fetchone()
-	#use fetchall() if you are expecting more than 1 data row
-	cursor.close()
-	error = None
-	if(data):
-		#creates a session for the the user
-		#session is a built in
-		session['email'] = email
-		return redirect(url_for('customer'))
-	else:
-		#returns an error message to the html page
-		error = 'Invalid login or username'
-		return render_template('customer_login.html', error=error)
-
 #Authenticates the register
-@app.route('/customerRegisterAuth', methods=['GET', 'POST'])
-def customerRegisterAuth():
-	#grabs information from the forms
-	email = request.form['email']
-	fname = request.form['fname']
-	lname = request.form['lname']
+@app.route('/staffRegisterAuth', methods=['POST'])
 
-	password = request.form['password']
-	hashed_password = md5(password.encode()).hexdigest()
-
-	building_num = request.form['building_num']
-	street = request.form['street']
-	apartment_num = request.form['apartment_num']
-	city = request.form["city"]
-	state = request.form["state"]
-	zip_code = request.form["zip_code"]
-	primary_phone_number = request.form["primary_phone_number"]
-	passport_number = request.form["passport_number"]
-	passport_expiration_date = request.form["passport_expiration_date"]
-	passport_country = request.form["passport_country"]
-	date_of_birth = request.form["date_of_birth"]
-
-	#cursor used to send queries
-	cursor = conn.cursor()
-	#executes query
-	query = 'SELECT * FROM customer WHERE email = %s'
-	cursor.execute(query, (email))
-	#stores the results in a variable
-	data = cursor.fetchone()
-	#use fetchall() if you are expecting more than 1 data row
-	error = None
-	if(data):
-		#If the previous query returns data, then user exists
-		error = "This user already exists"
-		return render_template('customer_register.html', error = error)
-	else:
-		ins = 'INSERT INTO user customer VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
-		cursor.execute(ins, (email, fname, lname, hashed_password, building_num, street, apartment_num, city, state, zip_code, primary_phone_number, passport_number, passport_expiration_date, passport_country, date_of_birth))
-		conn.commit()
-		cursor.close()
-		return render_template('index.html')
-	
-# -- STAFF --
-#Authenticates the login
-@app.route('/staffLoginAuth', methods=['GET', 'POST'])
-def staffLoginAuth():
-	#grabs information from the forms
-	username = request.form['username']
-	password = request.form['password']
-	hashed_password = md5(password.encode()).hexdigest()
-
-	#cursor used to send queries
-	cursor = conn.cursor()
-	#executes query
-	query = 'SELECT * FROM staff WHERE username = %s and password = %s'
-	cursor.execute(query, (username, hashed_password))
-	#stores the results in a variable
-	print(hashed_password)
-	data = cursor.fetchone()
-	#use fetchall() if you are expecting more than 1 data row
-	cursor.close()
-	error = None
-	if(data):
-		#creates a session for the the user
-		#session is a built in
-		session['username'] = username
-		return redirect(url_for('staff'))
-	else:
-		#returns an error message to the html page
-		error = 'Invalid login or username'
-		return render_template('staff_login.html', error=error)
-
-#Authenticates the register
-@app.route('/staffRegisterAuth', methods=['GET', 'POST'])
 def staffRegisterAuth():
-	#grabs information from the forms
 	username = request.form['username']
 	airline_name = request.form['airline_name']
 	password = request.form['password']
@@ -257,9 +147,7 @@ def staffRegisterAuth():
 		error = "This user already exists"
 		return render_template('staff_register.html', error=error)
 	else:
-		ins = """INSERT INTO staff (username, password, first_name, last_name, date_of_birth, 
-						 primary_email, airline_name)
-						 VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+		ins = "INSERT INTO staff (username, password, first_name, last_name, date_of_birth, primary_email, airline_name) VALUES (%s, %s, %s, %s, %s, %s, %s)"
 		hashed_password = hashlib.md5(request.form['password'].encode()).hexdigest()
 		cursor.execute(ins, (request.form['username'], hashed_password, request.form['first_name'],
 							 request.form['last_name'], request.form['date_of_birth'],
@@ -275,7 +163,68 @@ def staffRegisterAuth():
 def guest():
 	return render_template('guest.html')
 
+@app.route('/guestView', methods=['GET', 'POST'])
+def guestView():
+	cursor = conn.cursor()
+	params = request.form
+	error = None
 
+	query = 'SELECT f.airline_name, f.flight_num, f.departure_date, f.departure_time, f.arrival_date, f.arrival_time, f.status, f.departure_airport, f.arrival_airport, dep.city as departure_city, arr.city as arrival_city FROM Flight f JOIN Airport dep ON f.departure_airport = dep.code JOIN Airport arr ON f.arrival_airport = arr.code where status != \'cancelled\' AND ( departure_date > current_date OR ( departure_date = current_date AND departure_time > current_time ) )' 
+
+	queries = []
+
+	if 'source_city' in params and params['source_city']:
+		query += ' AND dep.city = %s'
+		queries.append(params['source_city'])
+	if 'destination_city' in params and params['destination_city']:
+		query += ' AND arr.city = %s'
+		queries.append(params['destination_city'])
+	if 'source_airport' in params and params['source_airport']:
+		query += ' AND f.departure_airport = %s'
+		queries.append(params['source_airport'])
+	if 'destination_airport' in params and params['destination_airport']:
+		query += ' AND f.arrival_airport = %s'
+		queries.append(params['destination_airport'])
+	if 'departure_date' in params and params['departure_date']:
+		query += ' AND f.departure_date = %s'
+		queries.append(params['departure_date'])
+
+	cursor.execute(query, queries)
+	data = cursor.fetchall()
+
+	if not data:
+		error = "There are no flights matching these parameters. Please try again"
+		return render_template('guest.html', error=error)
+
+	return_data = None
+
+	if 'return_date' in params:
+		return_query = 'SELECT f.airline_name, f.flight_num, f.departure_date, f.departure_time, f.arrival_date, f.arrival_time, f.status, f.departure_airport, f.arrival_airport, dep.city as departure_city, arr.city as arrival_city FROM Flight f JOIN Airport dep ON f.departure_airport = dep.code JOIN Airport arr ON f.arrival_airport = arr.code where status != \'cancelled\' AND ( departure_date > current_date OR ( departure_date = current_date AND departure_time > current_time ) )' 
+
+		return_queries = []
+
+		if 'source_city' in params and params['source_city']:
+			return_query += ' AND arr.city = %s'
+			return_queries.append(params['source_city'])
+		if 'destination_city' in params and params['destination_city']:
+			return_query += ' AND dep.city = %s'
+			return_queries.append(params['destination_city'])
+		if 'source_airport' in params and params['source_airport']:
+			return_query += ' AND f.arrival_airport = %s'
+			return_queries.append(params['source_airport'])
+		if 'destination_airport' in params and params['destination_airport']:
+			return_query += ' AND f.departure_airport = %s'
+			return_queries.append(params['destination_airport'])
+		
+		# condition for return flight
+		return_query += ' AND f.departure_date = %s'
+		return_queries.append(params['return_date'])
+
+		cursor.execute(return_query, return_queries)
+		return_data = cursor.fetchall()
+		print(return_query, return_data)
+	cursor.close()
+	return render_template('guest.html', results=data, ret=return_data)
 
 @app.route('/home')
 def home():
