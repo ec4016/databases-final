@@ -288,6 +288,48 @@ def specific_spending():
     else:
         return render_template('specific_spending.html',total_spending=0,start=start,end=end,monthly=results)
 
+@app.route('/staff_create_flights', methods=['POST'])
+def staff_create_flights():
+    print(request.form)
+    airline_name = request.form.get('airline_name')
+    flight_num = request.form.get('flight_num')
+    departure_date = request.form.get('departure_date')
+    departure_time = request.form.get('departure_time')
+    arrival_date = request.form.get('arrival_date')
+    arrival_time = request.form.get('arrival_time')
+    base_price = request.form.get('base_price')
+    status = request.form.get('status')
+    airplane_id = request.form.get('airplane_id')
+    departure_airport = request.form.get('departure_airport')
+    arrival_airport = request.form.get('arrival_airport')
+
+    data = {
+        'airline_name': airline_name,
+        'flight_num' : flight_num,
+        'departure_date': departure_date,
+        'departure_time': departure_time,
+        'arrival_date': arrival_date,
+        'arrival_time': arrival_time,
+        'base_price': base_price,
+        'status': status,
+        'airplane_id': airplane_id,
+        'departure_airport': departure_airport,
+        'arrival_airport': arrival_airport
+    }
+    
+    username = session['username']
+    cursor = conn.cursor()
+
+    error = None
+    if(data):
+        ins="INSERT INTO flight (airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, base_price, status, airplane_id, departure_airport, arrival_airport) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        cursor.execute(ins, (airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, base_price, status, airplane_id, departure_airport, arrival_airport))
+        conn.commit()
+        cursor.close()
+    
+    else:
+        error = "Data inputted incorrectly."
+        return render_template('home_customer.html', error=error)
 
 @app.route('/logout')
 def logout():
