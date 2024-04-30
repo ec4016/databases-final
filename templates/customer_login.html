@@ -14,16 +14,21 @@
 			</h1>
 		</div>
 
-        <form action="/customerLoginAuth" method="POST">
-            <input type="text" name ="email" placeholder="Email" required/></br>
-            <input type="password" name ="password" placeholder="Password" required/></br>
-            <br>
-            <input type="submit" value ="Login"/>
-            {% if error %}
-                <p class="error"><strong>Error: </strong>{{error}}</p>
-            {% endif %}
-        </form>
 
-        <a href="/">Go Back</a><br>
+            <form action="/customerLoginAuth" method="POST">
+                <div class="login-credentials">
+                    <input type="text" name ="email" placeholder="Email" required/></br>
+                    <input type="password" name ="password" placeholder="Password" required/></br>
+                    <br>
+                    <input class="login-button" type="submit" value ="Login"/>
+                </div>
+                    
+                {% if error %}
+                    <p class="error"><strong>Error: </strong>{{error}}</p>
+                {% endif %} 
+            </form>
+        
+
+        <a id="back-button" href="/">Go Back</a><br>
     </body>
 </html>

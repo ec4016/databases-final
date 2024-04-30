@@ -15,14 +15,17 @@
 		</div>
 
         <form action="/staffLoginAuth" method="POST">
-            <input type="text" name = "username" placeholder="username" required/> </br>
-            <input type="password" name = "password" placeholder="password" required/></br>
-            <input type="submit" value = Login />
+            <div class="login-credentials">
+                <input type="text" name ="email" placeholder="Email" required/></br>
+                <input type="password" name ="password" placeholder="Password" required/></br>
+                <br>
+                <input class="login-button" type="submit" value ="Login"/>
+            </div>
             {% if error %}
                 <p class="error"><strong>Error:</strong> {{error}}</p>
             {% endif %}
         </form>
 
-        <a href="/">Go Back</a><br>
+        <a id="back-button" href="/">Go Back</a><br>
     </body>
 </html>
