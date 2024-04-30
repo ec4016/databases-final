@@ -288,8 +288,8 @@ def specific_spending():
     else:
         return render_template('specific_spending.html',total_spending=0,start=start,end=end,monthly=results)
 
-@app.route('/staff_create_flight', methods=['POST'])
-def staff_create_flight():
+@app.route('/staff_new_flight', methods=['POST'])
+def staff_new_flight():
     print(request.form)
     airline_name = request.form.get('airline_name')
     flight_num = request.form.get('flight_num')
@@ -329,7 +329,7 @@ def staff_create_flight():
     
     else:
         error = "Data inputted incorrectly."
-        return render_template('staff_create_flight.html', error=error)
+        return render_template('staff_new_flight.html', error=error)
 
 @app.route('/staff_new_airplane', methods=['POST'])
 def staff_new_airplane():
@@ -364,7 +364,7 @@ def staff_new_airplane():
     
     else:
         error = "Data inputted incorrectly."
-        return render_template('staff_create_airplane.html', error=error)
+        return render_template('staff_new_airplane.html', error=error)
 
 @app.route('/staff_new_airport', methods=['POST'])
 def staff_new_airport():
