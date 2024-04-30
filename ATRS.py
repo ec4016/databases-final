@@ -288,8 +288,8 @@ def specific_spending():
     else:
         return render_template('specific_spending.html',total_spending=0,start=start,end=end,monthly=results)
 
-@app.route('/staff_create_flights', methods=['POST'])
-def staff_create_flights():
+@app.route('/staff_create_flight', methods=['POST'])
+def staff_create_flight():
     print(request.form)
     airline_name = request.form.get('airline_name')
     flight_num = request.form.get('flight_num')
@@ -329,7 +329,46 @@ def staff_create_flights():
     
     else:
         error = "Data inputted incorrectly."
-        return render_template('home_customer.html', error=error)
+        return render_template('staff_create_flight.html', error=error)
+
+@app.route('/staff_new_airplane', methods=['POST'])
+def staff_new_airplane():
+    print(request.form)
+    airline_name = request.form.get('airline_name')
+    airplane_id = request.form.get('airplane_id')
+    num_seats = request.form.get('num_seats')
+    manufacturer = request.form.get('manufacturer')
+    model_number = request.form.get('model_number')
+    manufacturing_date = request.form.get('manufacturing_date')
+    age = request.form.get('age')
+
+    data = {
+        'airline_name': airline_name,
+        'airplane_id': airplane_id,
+        'num_seats': num_seats,
+        'manufacturer': manufacturer,
+        'model_number': model_number,
+        'manufacturing_date': manufacturing_date,
+        'age': age
+    }
+
+    username = session['username']
+    cursor = conn.cursor()
+
+    error = None
+    if(data):
+        ins="INSERT INTO flight (airline_name, airplane_id, num_seats, manufacturer, model_number, manufacturing_date, age) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        cursor.execute(ins, (airline_name, airplane_id, num_seats, manufacturer, model_number, manufacturing_date, age))
+        conn.commit()
+        cursor.close()
+    
+    else:
+        error = "Data inputted incorrectly."
+        return render_template('staff_create_airplane.html', error=error)
+
+@app.route('/staff_new_airport', methods=['POST'])
+def staff_new_airport():
+    print(request.form)
 
 @app.route('/logout')
 def logout():
