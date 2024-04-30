@@ -331,6 +331,46 @@ def staff_new_flight():
         error = "Data inputted incorrectly."
         return render_template('staff_new_flight.html', error=error)
 
+@app.route('/change_flight_status', methods=['GET'])
+def change_flight_status():
+    print(request.args)
+    status = request.args.get('status')
+
+    username = session['username']
+    flight_num = request.form['flight_num']
+    cursor = conn.cursor()
+    query = 'SELECT flight_num FROM flight WHERE flight_num=%s'
+    cursor.execute(query, (username, flight_num))
+    data = cursor.fetchone()
+    change_error = None
+    
+    #cursor.execute(flights, username)
+    flightdata = cursor.fetchall()
+    if (data):
+        time_query = 'SELECT departure_date, departure_time FROM ticket WHERE ticket_id=%s'
+        cursor.execute(time_query, flight_num)
+        timedata = cursor.fetchone()
+        date = timedata['departure_date']
+        time = (datetime.min + timedata['departure_time']).time()
+
+        print(type(date), type(time))
+        print(time)
+        departure_date_time = datetime.combine(date, time)
+        now = datetime.now()
+        if ((departure_date_time - now) > timedelta(hours=0)):
+            update = "UPDATE Flight SET status=%s" \
+                     "WHERE flight_num=%s"
+            cursor.execute(update, flight_num)
+            conn.commit()
+            cursor.close()
+        else:
+            change_error = "Flight has already taken off"
+            return render_template('', change_error=change_error, username=username,
+                                   flights=flightdata)
+    else:
+        change_error = "Flight does not exist."
+        return render_template('', change_error=change_error, username=username, flights=flightdata)
+
 @app.route('/staff_new_airplane', methods=['POST'])
 def staff_new_airplane():
     print(request.form)
@@ -398,6 +438,7 @@ def staff_new_airport():
     else:
         error = "Data inputted incorrectly."
         return render_template('staff_new_airport.html', error=error)
+
 
 @app.route('/logout')
 def logout():
