@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel = "stylesheet" href="static\styles.css"/>
+        <title>Customer Login</title>
+    </head>
+
+    <body>
+        <div>
+			<h1>
+				<img id="cloud1" src="static\cloud.jpg" width="200px">
+				Welcome {{username}}!
+				<img id="airplane" src="static\airplane.png" width="200px">
+			</h1>
+		</div>
+
+		{% if flight_error %}
+        <p class="error"><strong>Error:</strong> {{flight_error}}</p>
+        {% else %}
+        
+        <h2>Rate Your Past Flights</h2>
+
+        <table>
+            <th>Airline</th>
+            <th>Flight Number</th>
+            <th>Departure Date</th>
+            <th>Departure Time</th>
+            <th>Rating</th>
+            <th>Comment</th>
+            {% for line in flights %}
+            <tr>
+                <td>{{line['airline_name']}}</td>
+                <td>{{line['flight_num']}}</td>
+                <td>{{line['departure_date']}}</td>
+                <td>{{line['departure_time']}}</td>
+                <th>{{line['rating']}}</th>
+                <th>{{line['comment']}}</th>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <form action="/rate" method="POST">
+            <div id="rate-inputs">
+                <h4 class="rate-labels">Flight Info:</h4>
+                <input type="text" name="airline_name" placeholder="Airline Name" required/>
+                <input type="text" name="flight_num" placeholder="Flight Number" required/> </br>
+                <h4 class="rate-labels">Departure Info:</h4>
+                Departure Date: <input type="date" name="departure_date" required/>
+                Departure Time: <input type="time" name="departure_time" required/> </br>
+                <h4 class="rate-labels">Rating:</h4>
+                <label><input type="radio" name="rating" value="1" required/> 1 </label>
+                <label><input type="radio" name="rating" value="2" required/> 2 </label>
+                <label><input type="radio" name="rating" value="3" required/> 3 </label>
+                <label><input type="radio" name="rating" value="4" required/> 4 </label>
+                <label><input type="radio" name="rating" value="5" required/> 5 </label></br>
+                <h4 class="rate-labels">Comment:</h4>
+                <input type="text" name="comment" placeholder="Xomment" required/> </br>
+                <input type="submit" value=Rate><br>
+                <h4>{{msg}}</h4>
+                {% if rating_error %}
+                <p class="error"><strong>Error:</strong> {{rating_error}}</p>
+
+                {% endif %}
+            </div>
+            
+        </form>
+
+        
+
+        {% endif %}
+
+        <a href="customer_home">Go back</a>
+
+    </body>
+</html>

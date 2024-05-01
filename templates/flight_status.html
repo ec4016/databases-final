@@ -1,0 +1,75 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel = "stylesheet" href="static\styles.css"/>
+        <title>Welcome Guest!</title>
+    </head>
+
+    <body>
+        <div>
+			<h1>
+				<img id="cloud1" src="static\cloud.jpg" width="200px">
+				Welcome Guest!
+				<img id="airplane" src="static\airplane.png" width="200px">
+			</h1>
+		</div>
+
+        <div class="check-flight-status">
+            <form action="/flightStatus" method="POST">
+                <h2>Check Flight Status</h2>
+                <div class="flight-status-filters">
+                    <input type="text" name = "airline_name" placeholder="Airline Name"/>
+                    <input type="text" name = "flight_num" placeholder="Flight Number"/>
+                    Departure Date: <input type="date" name = "departure_date" placeholder="Departure Date"/>
+                    Arrival Date: <input type="date" name = "arrival_date" placeholder="Arrival Date"/>
+                    <input type="submit" value = "Search"/><br><br>
+                </div>
+            </form>
+        </div>
+
+        <div class="flight-status">
+            {% if results %}
+            <table> 
+                <h3>Flight Status</h3>
+                <th>Airline</th>
+                <th>Flight Number</th>
+                <th>Airplane ID</th>
+                <th>Departure Date</th>
+                <th>Departure Time</th>
+                <th>Departure Airport</th>
+                <th>Departure City</th>
+                <th>Arrival Date</th>
+                <th>Arrival Time</th>
+                <th>Arrival Airport</th>
+                <th>Arrival City</th>
+                <th>Status</th>
+
+                {% for line in results %}
+                <tr>
+                    <td>{{line['airline_name']}}</td>
+                    <td>{{line['flight_num']}}</td>
+                    <td>{{line['airplane_id']}}</td>
+                    <td>{{line['departure_date']}}</td>
+                    <td>{{line['departure_time']}}</td>
+                    <td>{{line['departure_airport']}}</td>
+                    <td>{{line['departure_city']}}</td>
+                    <td>{{line['arrival_date']}}</td>
+                    <td>{{line['arrival_time']}}</td>
+                    <td>{{line['arrival_airport']}}</td>
+                    <td>{{line['arrival_city']}}</td>
+                    <td>{{line['status']}}</td>
+                </tr>
+                {% endfor %}
+
+            </table> <br>
+            {% endif %}
+        </div>
+
+        {% if error %}
+            <h3>Flight Status:</h3>
+            <div class="error"><strong>Error:</strong> {{error}}</div><br>
+        {% endif %}
+        
+        <a id="back-button" href="guest">Go Back</a><br>
+    </body>
+</html>
