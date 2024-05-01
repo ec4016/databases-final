@@ -21,11 +21,13 @@ def index():
 	return render_template('index.html')
 
 
+# -- CUSTOMER --
+#Define route for login
 @app.route('/customer_login')
 def login_customer():
 	return render_template('customer_login.html')
 
-
+#Authenticates the login
 @app.route('/customerLoginAuth', methods=['POST'])
 def cust_loginAuth():
 	username = request.form['email']
@@ -43,45 +45,6 @@ def cust_loginAuth():
 	else:
 		error = 'Invalid login or username'
 		return render_template('customer_login.html', error=error)
-
-
-# -- STAFF --
-#Define route for login
-@app.route('/staff_login')
-def staff_login():
-	return render_template('staff_login.html')
-
-#Authenticates the login
-@app.route('/staffLoginAuth', methods=['POST'])
-def staffLoginAuth():
-	username = request.form['username']
-	password = request.form['password']
-	hashed_password = hashlib.md5(password.encode()).hexdigest()
-	cursor = conn.cursor()
-	query = "SELECT * FROM staff WHERE username = %s AND password = %s"
-	cursor.execute(query, (username, hashed_password))
-	data = cursor.fetchone()
-	cursor.close()
-	error = None
-	if (data):
-		session['username'] = username
-		return render_template('home_staff.html', error=error)
-	else:
-		error = 'Invalid login or username'
-		return render_template('staff_login.html', error=error)
-
-
-#Define route for register
-@app.route('/staff_register')
-def staff_register():
-	return render_template('staff_register.html')
-
-
-
-
-@app.route('/register_customer')
-def register_customer():
-	return render_template('register_customer.html')
 
 
 #Define route for register
@@ -124,115 +87,6 @@ def custRegisterAuth():
 		return render_template('index.html')
 
 
-#Authenticates the register
-@app.route('/staffRegisterAuth', methods=['POST'])
-
-def staffRegisterAuth():
-	username = request.form['username']
-	airline_name = request.form['airline_name']
-	password = request.form['password']
-
-	# checks that password reaches required length
-	if len(password) < 8:
-		return render_template('staff_register.html', error="Password must be at least 8 characters long.")
-
-	cursor = conn.cursor()
-
-	# checks if airline exists in database
-	airlineCheck = 'SELECT * FROM airline WHERE name = %s'
-	cursor.execute(airlineCheck, (airline_name))
-	exists = cursor.fetchall()
-
-	if (not exists):
-		error = "The airline you have entered does not exist"
-		return render_template('staff_register.html', error=error)
-	
-	query = 'SELECT * FROM staff WHERE username = %s'
-	cursor.execute(query, (username))
-	data = cursor.fetchone()
-	error = None
-	if (data):
-		error = "This user already exists"
-		return render_template('staff_register.html', error=error)
-	else:
-		ins = "INSERT INTO staff (username, password, first_name, last_name, date_of_birth, primary_email, airline_name) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-		hashed_password = hashlib.md5(request.form['password'].encode()).hexdigest()
-		cursor.execute(ins, (request.form['username'], hashed_password, request.form['first_name'],
-							 request.form['last_name'], request.form['date_of_birth'],
-							 request.form['primary_email'], request.form['airline_name']))
-		conn.commit()
-		cursor.close()
-		return render_template('index.html')
-	
-# -- GUEST -- 
-@app.route('/guest')
-def guest():
-	return render_template('guest.html')
-
-@app.route('/guestView', methods=['GET', 'POST'])
-def guestView():
-	cursor = conn.cursor()
-	params = request.form
-	error = None
-
-	query = 'SELECT F.*, departureAirport.city AS departure_city, departureAirport.name AS departure_airport_name, arrivalAirport.city AS arrival_city, arrivalAirport.name AS arrival_airport_name FROM Flight F JOIN Airport departureAirport ON F.departure_airport = departureAirport.code JOIN Airport arrivalAirport ON F.arrival_airport = arrivalAirport.code WHERE (F.departure_date > CURRENT_DATE OR (F.departure_date = CURRENT_DATE AND F.departure_time > CURRENT_TIME)) AND F.status <> \'Cancelled\'' 
-
-	queries = []
-
-	if 'departure_city' in params and params['departure_city']:
-		query += ' AND departureAirport.city = %s'
-		queries.append(params['departure_city'])
-	if 'arrival_city' in params and params['arrival_city']:
-		query += ' AND arrivalAirport.city = %s'
-		queries.append(params['arrival_city'])
-	if 'departure_airport' in params and params['departure_airport']:
-		query += ' AND departureAirport.code = %s'
-		queries.append(params['departure_airport'])
-	if 'destination_airport' in params and params['destination_airport']:
-		query += ' AND arrivalAirport.code = %s'
-		queries.append(params['destination_airport'])
-	if 'departure_date' in params and params['departure_date']:
-		query += ' AND F.departure_date = %s'
-		queries.append(params['departure_date'])
-
-	cursor.execute(query, queries)
-	data = cursor.fetchall()
-
-	if not data:
-		error = "There are no flights matching these parameters. Please try again"
-		return render_template('guest.html', error=error)
-
-	return_data = None
-
-	if 'return_date' in params:
-		return_query = 'SELECT F.*, departureAirport.city AS departure_city, departureAirport.name AS departure_airport_name, arrivalAirport.city AS arrival_city, arrivalAirport.name AS arrival_airport_name FROM Flight F JOIN Airport departureAirport ON F.departure_airport = departureAirport.code JOIN Airport arrivalAirport ON F.arrival_airport = arrivalAirport.code WHERE (F.departure_date > CURRENT_DATE OR (F.departure_date = CURRENT_DATE AND F.departure_time > CURRENT_TIME)) AND F.status <> \'Cancelled\'' 
-
-		return_queries = []
-
-		if 'departure_city' in params and params['departure_city']:
-			return_query += ' AND arrivalAirport.city = %s'
-			return_queries.append(params['departure_city'])
-		if 'arrival_city' in params and params['arrival_city']:
-			return_query += ' AND departureAirport.city = %s'
-			return_queries.append(params['arrival_city'])
-		if 'departure_airport' in params and params['departure_airport']:
-			return_query += ' AND arrivalAirport.code = %s'
-			return_queries.append(params['departure_airport'])
-		if 'destination_airport' in params and params['destination_airport']:
-			return_query += ' AND departureAirport.code = %s'
-			return_queries.append(params['destination_airport'])
-		
-		# condition for return flight
-		return_query += ' AND F.departure_date = %s'
-		return_queries.append(params['return_date'])
-
-		cursor.execute(return_query, return_queries)
-		return_data = cursor.fetchall()
-		print(return_query, return_data)
-	cursor.close()
-	return render_template('guest.html', results=data, ret=return_data)
-
-
 @app.route('/customer_home')
 def customer_home():
 	username = session['username']
@@ -248,16 +102,6 @@ def customer_home():
 	data = cursor.fetchall()
 	cursor.close()
 	return render_template('customer_home.html', username=customerData['first_name'], flights=data)
-
-@app.route('/home_staff')
-def home_staff():
-	username = session['username']
-	cursor = conn.cursor();
-	query = 'SELECT first_name from staff where username = %s'
-	cursor.execute(query, username)
-	data = cursor.fetchall()
-	cursor.close()
-	return render_template('customer_home.html', username=username, flights=data)
 
 
 @app.route('/cust_add_num', methods=['POST'])
@@ -307,6 +151,7 @@ def flightSearch():
 	cursor = conn.cursor()
 	params = request.form
 	error = None
+	flightType = 'Future'
 
 	customer = 'SELECT first_name from customer where email=%s'
 	cursor.execute(customer, (username))
@@ -326,9 +171,9 @@ def flightSearch():
 	if 'departure_airport' in params and params['departure_airport']:
 		query += ' AND departureAirport.code = %s'
 		queries.append(params['departure_airport'])
-	if 'destination_airport' in params and params['destination_airport']:
+	if 'arrival_airport' in params and params['arrival_airport']:
 		query += ' AND arrivalAirport.code = %s'
-		queries.append(params['destination_airport'])
+		queries.append(params['arrival_airport'])
 	if 'departure_date' in params and params['departure_date']:
 		query += ' AND F.departure_date = %s'
 		queries.append(params['departure_date'])
@@ -337,42 +182,61 @@ def flightSearch():
 	data = cursor.fetchall()
 
 	if not data:
-		error = "There are no flights matching these parameters. Please try again"
-		return render_template('guest.html', error=error)
-
-	return_data = None
-
-	if 'return_date' in params:
-		return_query = 'SELECT F.*, departureAirport.city AS departure_city, departureAirport.name AS departure_airport_name, arrivalAirport.city AS arrival_city, arrivalAirport.name AS arrival_airport_name FROM Flight F JOIN Airport departureAirport ON F.departure_airport = departureAirport.code JOIN Airport arrivalAirport ON F.arrival_airport = arrivalAirport.code WHERE (F.departure_date > CURRENT_DATE OR (F.departure_date = CURRENT_DATE AND F.departure_time > CURRENT_TIME)) AND F.status <> \'Cancelled\'' 
-
-		return_queries = []
-
-		if 'departure_city' in params and params['departure_city']:
-			return_query += ' AND arrivalAirport.city = %s'
-			return_queries.append(params['departure_city'])
-		if 'arrival_city' in params and params['arrival_city']:
-			return_query += ' AND departureAirport.city = %s'
-			return_queries.append(params['arrival_city'])
-		if 'departure_airport' in params and params['departure_airport']:
-			return_query += ' AND arrivalAirport.code = %s'
-			return_queries.append(params['departure_airport'])
-		if 'destination_airport' in params and params['destination_airport']:
-			return_query += ' AND departureAirport.code = %s'
-			return_queries.append(params['destination_airport'])
+		error = "There are no flights matching these parameters. Please try again!"
+		return render_template('flight_search.html', username=fname, flightType=flightType, error=error)
 		
-		# condition for return flight
-		return_query += ' AND F.departure_date = %s'
-		return_queries.append(params['return_date'])
-		
-		# condition for return flight
-		return_query += ' AND f.departure_date = %s'
-		return_queries.append(params['return_date'])
-
-		cursor.execute(return_query, return_queries)
-		return_data = cursor.fetchall()
-		print(return_query, return_data)
 	cursor.close()
-	return render_template('flight_search.html', username=fname, results=data, ret=return_data)
+	return render_template('flight_search.html', username=fname, flightType=flightType, error=error, results=data)
+
+@app.route('/returnFlightSearch', methods=['GET', 'POST'])
+def returnFlightSearch():
+	username = session['username']
+	cursor = conn.cursor()
+	params = request.form
+	error = None
+	returnError = None
+	flightType = 'Future'
+
+	customer = 'SELECT first_name from customer where email=%s'
+	cursor.execute(customer, (username))
+	customerData = cursor.fetchone()
+	fname = customerData['first_name']
+
+	query = 'SELECT F.*, departureAirport.city AS departure_city, departureAirport.name AS departure_airport_name, arrivalAirport.city AS arrival_city, arrivalAirport.name AS arrival_airport_name FROM Flight F JOIN Airport departureAirport ON F.departure_airport = departureAirport.code JOIN Airport arrivalAirport ON F.arrival_airport = arrivalAirport.code WHERE (F.departure_date > CURRENT_DATE OR (F.departure_date = CURRENT_DATE AND F.departure_time > CURRENT_TIME)) AND F.status <> \'Cancelled\'' 
+
+	queries = []
+
+	if 'departure_city' in params and params['departure_city']:
+		query += ' AND departureAirport.city = %s'
+		queries.append(params['departure_city'])
+	if 'arrival_city' in params and params['arrival_city']:
+		query += ' AND arrivalAirport.city = %s'
+		queries.append(params['arrival_city'])
+	if 'departure_airport' in params and params['departure_airport']:
+		query += ' AND departureAirport.code = %s'
+		queries.append(params['departure_airport'])
+	if 'arrival_airport' in params and params['arrival_airport']:
+		query += ' AND arrivalAirport.code = %s'
+		queries.append(params['arrival_airport'])
+	if 'departure_date' in params and params['departure_date']:
+		query += ' AND F.departure_date = %s'
+		queries.append(params['departure_date'])
+	if 'return_date' in params and params['return_date']:
+		flightType = 'Return'
+		query += ' AND F.departure_date = %s'
+		queries.append(params['return_date'])
+
+	cursor.execute(query, queries)
+	data = cursor.fetchall()
+
+	if not data:
+		returnError = "There are no return flights matching these parameters. Please try again!"
+		flightType = 'Future'
+		return render_template('flight_search.html', username=fname, flightType=flightType, returnError=returnError)
+
+		
+	cursor.close()
+	return render_template('flight_search.html', username=fname, flightType=flightType, error=error, results=data)
 
 
 @app.route('/cancel_flight', methods=['POST'])
@@ -483,6 +347,183 @@ def specific_spending():
 		return render_template('spending.html',total_spending=data['total_spending'],start=start,end=end,monthly=results, error=error, specific=specific)
 	else:
 		return render_template('spending.html',total_spending=0,start=start,end=end,monthly=results, error=error, specific=specific)
+
+
+# -- STAFF --
+#Define route for login
+@app.route('/staff_login')
+def staff_login():
+	return render_template('staff_login.html')
+
+#Authenticates the login
+@app.route('/staffLoginAuth', methods=['POST'])
+def staffLoginAuth():
+	username = request.form['username']
+	password = request.form['password']
+	hashed_password = hashlib.md5(password.encode()).hexdigest()
+	cursor = conn.cursor()
+	query = "SELECT * FROM staff WHERE username = %s AND password = %s"
+	cursor.execute(query, (username, hashed_password))
+	data = cursor.fetchone()
+	cursor.close()
+	error = None
+	if (data):
+		session['username'] = username
+		return render_template('staff_home.html', error=error)
+	else:
+		error = 'Invalid login or username'
+		return render_template('staff_login.html', error=error)
+
+
+#Define route for register
+@app.route('/staff_register')
+def staff_register():
+	return render_template('staff_register.html')
+
+#Authenticates the register
+@app.route('/staffRegisterAuth', methods=['POST'])
+
+def staffRegisterAuth():
+	username = request.form['username']
+	airline_name = request.form['airline_name']
+	password = request.form['password']
+
+	# checks that password reaches required length
+	if len(password) < 8:
+		return render_template('staff_register.html', error="Password must be at least 8 characters long.")
+
+	cursor = conn.cursor()
+
+	# checks if airline exists in database
+	airlineCheck = 'SELECT * FROM airline WHERE name = %s'
+	cursor.execute(airlineCheck, (airline_name))
+	exists = cursor.fetchall()
+
+	if (not exists):
+		error = "The airline you have entered does not exist"
+		return render_template('staff_register.html', error=error)
+	
+	query = 'SELECT * FROM staff WHERE username = %s'
+	cursor.execute(query, (username))
+	data = cursor.fetchone()
+	error = None
+	if (data):
+		error = "This user already exists"
+		return render_template('staff_register.html', error=error)
+	else:
+		ins = "INSERT INTO staff (username, password, first_name, last_name, date_of_birth, primary_email, airline_name) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+		hashed_password = hashlib.md5(request.form['password'].encode()).hexdigest()
+		cursor.execute(ins, (request.form['username'], hashed_password, request.form['first_name'],
+							 request.form['last_name'], request.form['date_of_birth'],
+							 request.form['primary_email'], request.form['airline_name']))
+		conn.commit()
+		cursor.close()
+		return render_template('index.html')
+	
+
+
+# -- GUEST -- 
+@app.route('/guest')
+def guest():
+	return render_template('guest.html')
+
+@app.route('/guestView', methods=['GET', 'POST'])
+def guestView():
+	cursor = conn.cursor()
+	params = request.form
+	error = None
+	flightType = 'Future'
+
+	query = 'SELECT F.*, departureAirport.city AS departure_city, departureAirport.name AS departure_airport_name, arrivalAirport.city AS arrival_city, arrivalAirport.name AS arrival_airport_name FROM Flight F JOIN Airport departureAirport ON F.departure_airport = departureAirport.code JOIN Airport arrivalAirport ON F.arrival_airport = arrivalAirport.code WHERE (F.departure_date > CURRENT_DATE OR (F.departure_date = CURRENT_DATE AND F.departure_time > CURRENT_TIME)) AND F.status <> \'Cancelled\'' 
+
+	queries = []
+
+	if 'departure_city' in params and params['departure_city']:
+		query += ' AND departureAirport.city = %s'
+		queries.append(params['departure_city'])
+	if 'arrival_city' in params and params['arrival_city']:
+		query += ' AND arrivalAirport.city = %s'
+		queries.append(params['arrival_city'])
+	if 'departure_airport' in params and params['departure_airport']:
+		query += ' AND departureAirport.code = %s'
+		queries.append(params['departure_airport'])
+	if 'arrival_airport' in params and params['arrival_airport']:
+		query += ' AND arrivalAirport.code = %s'
+		queries.append(params['arrival_airport'])
+	if 'departure_date' in params and params['departure_date']:
+		query += ' AND F.departure_date = %s'
+		queries.append(params['departure_date'])
+
+	cursor.execute(query, queries)
+	data = cursor.fetchall()
+
+	if not data:
+		error = "There are no flights matching these parameters. Please try again!"
+		return render_template('guest.html', flightType=flightType, error=error)
+		
+	cursor.close()
+	return render_template('guest.html', flightType=flightType, error=error, results=data)
+
+@app.route('/guestReturnFlight', methods=['GET', 'POST'])
+def guestReturnFlight():
+	cursor = conn.cursor()
+	params = request.form
+	error = None
+	returnError = None
+	flightType = 'Future'
+
+	query = 'SELECT F.*, departureAirport.city AS departure_city, departureAirport.name AS departure_airport_name, arrivalAirport.city AS arrival_city, arrivalAirport.name AS arrival_airport_name FROM Flight F JOIN Airport departureAirport ON F.departure_airport = departureAirport.code JOIN Airport arrivalAirport ON F.arrival_airport = arrivalAirport.code WHERE (F.departure_date > CURRENT_DATE OR (F.departure_date = CURRENT_DATE AND F.departure_time > CURRENT_TIME)) AND F.status <> \'Cancelled\'' 
+
+	queries = []
+
+	if 'departure_city' in params and params['departure_city']:
+		query += ' AND departureAirport.city = %s'
+		queries.append(params['departure_city'])
+	if 'arrival_city' in params and params['arrival_city']:
+		query += ' AND arrivalAirport.city = %s'
+		queries.append(params['arrival_city'])
+	if 'departure_airport' in params and params['departure_airport']:
+		query += ' AND departureAirport.code = %s'
+		queries.append(params['departure_airport'])
+	if 'arrival_airport' in params and params['arrival_airport']:
+		query += ' AND arrivalAirport.code = %s'
+		queries.append(params['arrival_airport'])
+	if 'departure_date' in params and params['departure_date']:
+		query += ' AND F.departure_date = %s'
+		queries.append(params['departure_date'])
+	if 'return_date' in params and params['return_date']:
+		flightType = 'Return'
+		query += ' AND F.departure_date = %s'
+		queries.append(params['return_date'])
+
+	cursor.execute(query, queries)
+	data = cursor.fetchall()
+
+	if not data:
+		returnError = "There are no return flights matching these parameters. Please try again!"
+		flightType = 'Future'
+		return render_template('guest.html', flightType=flightType, returnError=returnError)
+
+	cursor.close()
+	return render_template('guest.html', flightType=flightType, error=error, results=data)
+
+
+
+
+@app.route('/home_staff')
+def home_staff():
+	username = session['username']
+	cursor = conn.cursor();
+	query = 'SELECT first_name from staff where username = %s'
+	cursor.execute(query, username)
+	data = cursor.fetchall()
+	cursor.close()
+	return render_template('customer_home.html', username=username, flights=data)
+
+
+
+
+
 
 
 @app.route('/logout')
