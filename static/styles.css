@@ -70,6 +70,7 @@ input {
     border-radius: 15px;
     padding: 10px;
     background-color: white;
+    margin: 5px;
 }
 
 input[type=submit] {
@@ -151,6 +152,33 @@ input[type=submit]:hover {
     padding-left: 20px;
 }
 
+
+#guest-links {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+#flight-status-page {
+    justify-self: center;
+}
+
+.check-flight-status {
+    text-align: center;
+    border: 1px solid black;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+#flight-search-links {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+#purchase-page {
+    justify-self: center;
+}
+
+
 /* CUSTOMER/STAFF LOGIN */
 .login-credentials {
     text-align: center;
@@ -206,6 +234,16 @@ input[type=submit]:hover {
     margin-bottom: 30px;
 }
 
+#rate-inputs {
+    text-align: center;
+    padding: 10px;
+    border: 1px solid black;
+    border-radius: 15px;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+}
 
 /* FLIGHT SEARCH */
 .future-flights {
@@ -230,4 +268,14 @@ input[type=submit]:hover {
 
 .date-labels {
     margin-top: -18px;
+}
+
+/* -- STAFF -- */
+#staff-register {
+    border: 1px solid black;
+    border-radius: 15px;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
 }
