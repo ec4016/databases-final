@@ -287,99 +287,6 @@ def returnFlightSearch():
     cursor.close()
     return render_template('flight_search.html', username=fname, flightType=flightType, error=error, results=data)
 
-# @app.route('/get_purchase', methods=['POST'])
-# def get_purchase():
-#     username = session['username']
-#     airline = request.form['airline']
-#     flight_num = request.form['flight_num']
-#     departure_date = request.form['departure_date']
-#     departure_time = request.form['departure_time']
-#     query = "SELECT * FROM flight WHERE airline_name=%s AND flight_num=%s AND departure_date=%s " \
-#             "AND TIME_FORMAT(departure_time, '%%H') = TIME_FORMAT(%s, '%%H')"
-#     cursor = conn.cursor()
-#     cursor.execute(query, (airline, flight_num, departure_date, departure_time))
-#     exist = cursor.fetchone()
-#     cursor.close()
-#     flight_error = None
-#     if (exist):
-#         if (datetime.strptime(departure_date, '%Y-%m-%d') < datetime.today()):
-#             flight_error = "The Flight is a Past Flight"
-#             return render_template('flight_search.html', flight_error=flight_error)
-#         else:
-#             #print(exist)
-#             exist['departure_time'] = int(exist['departure_time'].total_seconds())
-#             exist['arrival_time'] = int(exist['arrival_time'].total_seconds())
-#             session['flight'] = exist
-#             return render_template('purchase.html',flight=exist)
-#     else:
-#         flight_error = "The Flight Does Not Exist"
-#         return render_template('flight_search.html', flight_error=flight_error)
-
-# @app.route('/purchase', methods=['GET', 'POST'])
-# def purchase():
-#     username = session['username']
-#     flight = session['flight']
-#     flight_num = flight['flight_num']
-#     airline_name = flight['airline_name']
-#     departure_date = datetime.strptime(flight['departure_date'], "%a, %d %b %Y %H:%M:%S %Z")
-#     departure_date=departure_date.strftime("%Y-%m-%d")
-#     departure_time = timedelta(seconds=flight['departure_time'])
-#     airplane_id = flight['airplane_id']
-#     first = request.form['first']
-#     last = request.form['last']
-#     birthday = request.form['birthday']
-#     type = request.form['type']
-#     card_fname = request.form['card_fname']
-#     card_lname = request.form['card_lname']
-#     card_num = request.form['card_num']
-#     expiration = request.form['expiration']
-#     cursor = conn.cursor()
-#     find_ticket = 'SELECT ticket_id ' \
-#                   'FROM ticket WHERE airline_name = %s ' \
-#                   'AND flight_num = %s AND departure_date = %s ' \
-#                   'AND departure_time = %s ' \
-#                   'AND sold_price IS NULL ' \
-#                   'AND first_name IS NULL ' \
-#                   'AND last_name IS NULL ' \
-#                   'AND date_of_birth IS NULL ' \
-#                   'LIMIT 1'
-#     cursor.execute(find_ticket, (airline_name, flight_num, departure_date, departure_time))
-#     data = cursor.fetchone()
-#     ticket_id = data['ticket_id']
-#     ins = 'INSERT INTO purchase(email,ticket_id,card_type,card_num, ' \
-#           'card_fname, card_lname, expiration_date, purchase_date, purchase_time)' \
-#           'VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)'
-#     purchase_date = datetime.today()
-#     time = current_time = datetime.now().time()
-#     purchase_time = current_time.strftime('%H:%M:%S')
-#     cursor.execute(ins, (username, ticket_id, type, card_num, card_fname, card_lname, expiration, purchase_date, purchase_time))
-#     conn.commit()
-#     price = 'SELECT base_price FROM flight WHERE airline_name = %s ' \
-#             'AND flight_num = %s AND departure_date =%s AND departure_time = %s'
-#     cursor.execute(price, (airline_name, flight_num, departure_date, departure_time))
-#     data = cursor.fetchone()
-#     base_price = data['base_price']
-#     capacity = 'SELECT num_seats FROM airplane WHERE airline_name=%s AND airplane_id=%s'
-#     cursor.execute(capacity, (airline_name, airplane_id))
-#     data = cursor.fetchone()
-#     max_passenger = data['num_seats']
-#     seats_filled = 'SELECT COUNT(ticket_id) AS total_tickets ' \
-#                    'FROM ticket WHERE sold_price IS NOT NULL AND first_name IS NOT NULL ' \
-#                    'AND last_name IS NOT NULL AND date_of_birth IS NOT NULL AND airline_name IS NOT NULL ' \
-#                    'AND departure_date IS NOT NULL AND departure_time IS NOT NULL'
-#     cursor.execute(seats_filled)
-#     data = cursor.fetchone()
-#     passengers = data['total_tickets']
-#     sold_price = base_price
-#     if (passengers / max_passenger >= 0.8):
-#         sold_price *= 1.25
-#     update = 'UPDATE Ticket SET sold_price = %s, first_name = %s, last_name = %s,date_of_birth = %s ' \
-#              'WHERE ticket_id = %s AND airline_name = %s AND flight_num = %s ' \
-#              'AND departure_date = %s AND departure_time = %s'
-#     cursor.execute(update, (
-#         sold_price, first, last, birthday, ticket_id, airline_name, flight_num, departure_date, departure_time))
-#     conn.commit()
-#     return redirect(url_for('customer_home'))
 
 
 @app.route('/rating', methods=['GET'])
@@ -607,6 +514,111 @@ def staffRegisterAuth():
         cursor.close()
         return render_template('index.html')
     
+@app.route('/staff_add_num', methods=['POST'])
+def staff_add_num():
+    username = session['username']
+    number = request.form['phonenumber']
+    cursor = conn.cursor()
+
+    customer = 'SELECT first_name from staff where username=%s'
+    cursor.execute(customer, (username))
+    customerData = cursor.fetchone()
+    fname = customerData['first_name']
+
+    query = 'SELECT * FROM staff_phone_numbers WHERE username=%s AND phone_number=%s'
+    cursor.execute(query, (username, number))
+    data = cursor.fetchone()
+    phone_error = None
+    # flights = 'SELECT ticket_id, airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, status, ' \
+    #           'airplane_id, departure_airport, arrival_airport, sold_price, first_name, last_name' \
+    #           ' FROM flight NATURAL JOIN ticket NATURAL JOIN purchase' \
+    #           ' WHERE email=%s'
+    # cursor.execute(flights, username)
+    flightdata = cursor.fetchall()
+    if (data):
+        phone_error = "This number already exists"
+        return render_template('staff_home.html', phone_error=phone_error, username=fname)
+        # return render_template('staff_home.html', phone_error=phone_error, username=fname, flights=flightdata)
+    else:
+        ins = "INSERT INTO staff_phone_numbers (username, phone_number) VALUES (%s, %s)"
+        cursor.execute(ins, (username, number))
+        conn.commit()
+        cursor.close()
+        return render_template('staff_home.html', phone_error=phone_error, username=fname)
+        # return render_template('staff_home.html', username=fname, flights=flightdata)
+
+@app.route('/staff_add_email', methods=['POST'])
+def staff_add_email():
+    username = session['username']
+    email = request.form['email']
+    cursor = conn.cursor()
+
+    customer = 'SELECT first_name from staff where username=%s'
+    cursor.execute(customer, (username))
+    customerData = cursor.fetchone()
+    fname = customerData['first_name']
+
+    query = 'SELECT * FROM staff_email WHERE username=%s AND email=%s'
+    cursor.execute(query, (username, email))
+    data = cursor.fetchone()
+    email_error = None
+    # flights = 'SELECT ticket_id, airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, status, ' \
+    #           'airplane_id, departure_airport, arrival_airport, sold_price, first_name, last_name' \
+    #           ' FROM flight NATURAL JOIN ticket NATURAL JOIN purchase' \
+    #           ' WHERE email=%s'
+    # cursor.execute(flights, username)
+    # flightdata = cursor.fetchall()
+    if (data):
+        email_error = "This number already exists"
+        return render_template('staff_home.html', email_error=email_error, username=fname)
+        # return render_template('staff_home.html', phone_error=phone_error, username=fname, flights=flightdata)
+    else:
+        ins = "INSERT INTO staff_email (username, email) VALUES (%s, %s)"
+        cursor.execute(ins, (username, email))
+        conn.commit()
+        cursor.close()
+        return render_template('staff_home.html', email_error=email_error, username=fname)
+        # return render_template('staff_home.html', username=fname, flights=flightdata)
+    
+@app.route('/edit_flights')
+def edit_flights():
+    return render_template('edit_flights.html')
+
+# @app.route('/staff_new_airplane', methods=['POST'])
+# def staff_new_airplane():
+#     print(request.form)
+#     airline_name = request.form.get('airline_name')
+#     airplane_id = request.form.get('airplane_id')
+#     num_seats = request.form.get('num_seats')
+#     manufacturer = request.form.get('manufacturer')
+#     model_number = request.form.get('model_number')
+#     manufacturing_date = request.form.get('manufacturing_date')
+#     age = request.form.get('age')
+
+#     data = {
+#         'airline_name': airline_name,
+#         'airplane_id': airplane_id,
+#         'num_seats': num_seats,
+#         'manufacturer': manufacturer,
+#         'model_number': model_number,
+#         'manufacturing_date': manufacturing_date,
+#         'age': age
+#     }
+
+#     username = session['username']
+#     cursor = conn.cursor()
+
+#     error = None
+#     if(data):
+#         ins="INSERT INTO flight (airline_name, airplane_id, num_seats, manufacturer, model_number, manufacturing_date, age) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+#         cursor.execute(ins, (airline_name, airplane_id, num_seats, manufacturer, model_number, manufacturing_date, age))
+#         conn.commit()
+#         cursor.close()
+    
+#     else:
+#         error = "Data inputted incorrectly."
+#         return render_template('staff_new_airplane.html', error=error)
+
 
 
 # -- GUEST -- 
@@ -733,15 +745,15 @@ def flightStatus():
     return render_template('flight_status.html', error=error, results=data)
 
 
-@app.route('/home_staff')
-def home_staff():
+@app.route('/staff_home')
+def staff_home():
     username = session['username']
     cursor = conn.cursor();
     query = 'SELECT first_name from staff where username = %s'
     cursor.execute(query, username)
     data = cursor.fetchall()
     cursor.close()
-    return render_template('customer_home.html', username=username, flights=data)
+    return render_template('staff_home.html', username=username, flights=data)
 
 
 
@@ -789,6 +801,112 @@ def stafftView():
 		
 	cursor.close()
 	return render_template('guest.html', flightType=flightType, error=error, results=data)
+
+
+@app.route('/purchase')
+def purchase():
+    return render_template('purchase.html')
+
+@app.route('/get_purchase', methods=['POST'])
+def get_purchase():
+    username = session['username']
+    airline = request.form['airline']
+    flight_num = request.form['flight_num']
+    departure_date = request.form['departure_date']
+    departure_time = request.form['departure_time']
+    query = "SELECT * FROM flight WHERE airline_name=%s AND flight_num=%s AND departure_date=%s " \
+            "AND TIME_FORMAT(departure_time, '%%H') = TIME_FORMAT(%s, '%%H')"
+    cursor = conn.cursor()
+    cursor.execute(query, (airline, flight_num, departure_date, departure_time))
+    exist = cursor.fetchone()
+    cursor.close()
+    flight_error = None
+    if (exist):
+        if (datetime.strptime(departure_date, '%Y-%m-%d') < datetime.today()):
+            flight_error = "The Flight is a Past Flight"
+            return render_template('flight_search.html', flight_error=flight_error)
+        else:
+            #print(exist)
+            exist['departure_time'] = int(exist['departure_time'].total_seconds())
+            exist['arrival_time'] = int(exist['arrival_time'].total_seconds())
+            session['flight'] = exist
+            return render_template('purchase.html',flight=exist)
+    else:
+        flight_error = "The Flight Does Not Exist"
+        return render_template('flight_search.html', flight_error=flight_error)
+
+@app.route('/purchase_flight', methods=['GET', 'POST'])
+def purchase_flight():
+    username = session['username']
+    if 'flight' in session:
+        flight = session['flight']
+        print("Flight session variable exists:", flight)
+        # Rest of your code...
+    else:
+        print("Flight session variable does not exist")
+        return redirect(url_for('flight_search'))
+    flight_num = flight['flight_num']
+    airline_name = flight['airline_name']
+    departure_date = datetime.strptime(flight['departure_date'], "%a, %d %b %Y %H:%M:%S %Z")
+    departure_date=departure_date.strftime("%Y-%m-%d")
+    departure_time = timedelta(seconds=flight['departure_time'])
+    airplane_id = flight['airplane_id']
+    first = request.form['first']
+    last = request.form['last']
+    birthday = request.form['birthday']
+    type = request.form['type']
+    card_fname = request.form['card_fname']
+    card_lname = request.form['card_lname']
+    card_num = request.form['card_num']
+    expiration = request.form['expiration']
+    cursor = conn.cursor()
+    find_ticket = 'SELECT ticket_id ' \
+                  'FROM ticket WHERE airline_name = %s ' \
+                  'AND flight_num = %s AND departure_date = %s ' \
+                  'AND departure_time = %s ' \
+                  'AND sold_price IS NULL ' \
+                  'AND first_name IS NULL ' \
+                  'AND last_name IS NULL ' \
+                  'AND date_of_birth IS NULL ' \
+                  'LIMIT 1'
+    cursor.execute(find_ticket, (airline_name, flight_num, departure_date, departure_time))
+    data = cursor.fetchone()
+    ticket_id = data['ticket_id']
+    ins = 'INSERT INTO purchase(email,ticket_id,card_type,card_num, ' \
+          'card_fname, card_lname, expiration_date, purchase_date, purchase_time)' \
+          'VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)'
+    purchase_date = datetime.today()
+    time = current_time = datetime.now().time()
+    purchase_time = current_time.strftime('%H:%M:%S')
+    cursor.execute(ins, (username, ticket_id, type, card_num, card_fname, card_lname, expiration, purchase_date, purchase_time))
+    conn.commit()
+    price = 'SELECT base_price FROM flight WHERE airline_name = %s ' \
+            'AND flight_num = %s AND departure_date =%s AND departure_time = %s'
+    cursor.execute(price, (airline_name, flight_num, departure_date, departure_time))
+    data = cursor.fetchone()
+    base_price = data['base_price']
+    capacity = 'SELECT num_seats FROM airplane WHERE airline_name=%s AND airplane_id=%s'
+    cursor.execute(capacity, (airline_name, airplane_id))
+    data = cursor.fetchone()
+    max_passenger = data['num_seats']
+    seats_filled = 'SELECT COUNT(ticket_id) AS total_tickets ' \
+                   'FROM ticket WHERE sold_price IS NOT NULL AND first_name IS NOT NULL ' \
+                   'AND last_name IS NOT NULL AND date_of_birth IS NOT NULL AND airline_name IS NOT NULL ' \
+                   'AND departure_date IS NOT NULL AND departure_time IS NOT NULL'
+    cursor.execute(seats_filled)
+    data = cursor.fetchone()
+    passengers = data['total_tickets']
+    sold_price = base_price
+    if (passengers / max_passenger >= 0.8):
+        sold_price *= 1.25
+    update = 'UPDATE Ticket SET sold_price = %s, first_name = %s, last_name = %s,date_of_birth = %s ' \
+             'WHERE ticket_id = %s AND airline_name = %s AND flight_num = %s ' \
+             'AND departure_date = %s AND departure_time = %s'
+    cursor.execute(update, (
+        sold_price, first, last, birthday, ticket_id, airline_name, flight_num, departure_date, departure_time))
+    conn.commit()
+    return redirect(url_for('flight_search'))
+
 
 
 
