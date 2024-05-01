@@ -7,39 +7,31 @@
 	table, th, td{
 		border: 1px solid black;
 	}
-
     </style>
-{% if flight %}
-<table>
-    <th>Airline</th>
-    <th>Flight Number</th>
-    <th>Departure Date</th>
-    <th>Departure Time</th>
-    <th>Departure Airport</th>
-    <th>Departure City</th>
-    <th>Arrival Date</th>
-    <th>Arrival Time</th>
-    <th>Arrival Airport</th>
-    <th>Arrival City</th>
-    <th>Status</th>
-
-    {% for line in flight %}
-    <tr>
-        <td>{{line['airline_name']}}</td>
-        <td>{{line['flight_num']}}</td>
-        <td>{{line['departure_date']}}</td>
-        <td>{{line['departure_time']}}</td>
-        <td>{{line['departure_airport']}}</td>
-        <td>{{line['departure_city']}}</td>
-        <td>{{line['arrival_date']}}</td>
-        <td>{{line['arrival_time']}}</td>
-        <td>{{line['arrival_airport']}}</td>
-        <td>{{line['arrival_city']}}</td>
-        <td>{{line['status']}}</td>
-    </tr>
-    {% endfor %}
-</table>
-{% endif %}
+    {% if flight %}
+    <table>
+        <th>Airline</th>
+        <th>Flight Number</th>
+        <th>Departure Date</th>
+        <th>Departure Time</th>
+        <th>Departure Airport</th>
+        <th>Arrival Date</th>
+        <th>Arrival Time</th>
+        <th>Arrival Airport</th>
+        <th>Status</th>
+        <tr>
+            <td>{{flight['airline_name']}}</td>
+            <td>{{flight['flight_num']}}</td>
+            <td>{{flight['departure_date']}}</td>
+            <td>{{flight['departure_time']}}</td>
+            <td>{{flight['departure_airport']}}</td>
+            <td>{{flight['arrival_date']}}</td>
+            <td>{{flight['arrival_time']}}</td>
+            <td>{{flight['arrival_airport']}}</td>
+            <td>{{flight['status']}}</td>
+        </tr>
+    </table>
+    {% endif %}
 </head>
 <body>
 <form action="/purchase" method="POST">
@@ -50,7 +42,8 @@
     <h2>Card Information</h2>
     <label><input type="radio" name="type" value="Credit" required/> credit </label></br>
     <label><input type="radio" name="type" value="Debit" required/>debit </label></br>
-    <input type="text" name="card_name" placeholder="Cardholder Name" required/></br>
+    <input type="text" name="card_fname" placeholder="Cardholder Firstname" required/></br>
+    <input type="text" name="card_lname" placeholder="Cardholder Lastname" required/></br>
     <input type="text" name="card_num" placeholder="Card Number" required/></br>
     <label>Expiration Date:<input type="date" name="expiration" placeholder="Departure Date" required/></label></br>
     <input type="submit" value="Book"/><br>

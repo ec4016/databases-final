@@ -446,23 +446,14 @@ def get_purchase():
             flight_error = "The Flight is a Past Flight"
             return render_template('flight_search.html', flight_error=flight_error)
         else:
+            #print(exist)
             exist['departure_time'] = int(exist['departure_time'].total_seconds())
             exist['arrival_time'] = int(exist['arrival_time'].total_seconds())
             session['flight'] = exist
-            return redirect(url_for('purchase_render'))
+            return render_template('purchase.html',flight=exist)
     else:
         flight_error = "The Flight Does Not Exist"
         return render_template('flight_search.html', flight_error=flight_error)
-
-
-@app.route('/purchase_render', methods=['GET', 'POST'])
-def purchase_render():
-    flight = session['flight']
-    # flight['departure_time'] = timedelta(seconds=flight['departure_time'])
-    # flight['arrival_time'] = timedelta(seconds=flight['arrival_time'])
-    # print(flight)
-    return render_template('purchase.html', flight=flight)
-
 
 @app.route('/purchase', methods=['GET', 'POST'])
 def purchase():
@@ -470,46 +461,65 @@ def purchase():
     flight = session['flight']
     flight_num = flight['flight_num']
     airline_name = flight['airline_name']
-    departure_date = flight['departure_date']
+    departure_date = datetime.strptime(flight['departure_date'], "%a, %d %b %Y %H:%M:%S %Z")
+    departure_date=departure_date.strftime("%Y-%m-%d")
     departure_time = timedelta(seconds=flight['departure_time'])
-    airplane_id=flight['airplane_id']
+    airplane_id = flight['airplane_id']
     first = request.form['first']
     last = request.form['last']
     birthday = request.form['birthday']
     type = request.form['type']
-    card_name = request.form['card_name']
+    card_fname = request.form['card_fname']
+    card_lname = request.form['card_lname']
     card_num = request.form['card_num']
     expiration = request.form['expiration']
     cursor = conn.cursor()
-    print(flight)
     find_ticket = 'SELECT ticket_id ' \
-            'FROM Ticket WHERE airline_name = %s ' \
-            'AND flight_num = %s AND departure_date = %s' \
-            'AND departure_time = %s AND sold_price IS NULL' \
-            'AND first_name IS NULL' \
-            'AND last_name IS NULL' \
-            'AND date_of_birth IS NULL' \
-            'LIMIT 1'
-    cursor.execute(find_ticket, (airline_name,flight_num,  departure_date, departure_time))
+                  'FROM ticket WHERE airline_name = %s ' \
+                  'AND flight_num = %s AND departure_date = %s ' \
+                  'AND departure_time = %s ' \
+                  'AND sold_price IS NULL ' \
+                  'AND first_name IS NULL ' \
+                  'AND last_name IS NULL ' \
+                  'AND date_of_birth IS NULL ' \
+                  'LIMIT 1'
+    cursor.execute(find_ticket, (airline_name, flight_num, departure_date, departure_time))
     data = cursor.fetchone()
     ticket_id = data['ticket_id']
-    ins = 'INSERT INTO purchase(email,ticket_id,card_type,card_num,card_name,expiration_date,purchase_date,purchase_time)' \
-          'VALUES (%s,%s,%s,%s,%s,%s,%s,%s)'
-    purchase_date=datetime.today()
-    time=current_time = datetime.now().time()
+    ins = 'INSERT INTO purchase(email,ticket_id,card_type,card_num, ' \
+          'card_fname, card_lname, expiration_date, purchase_date, purchase_time)' \
+          'VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)'
+    purchase_date = datetime.today()
+    time = current_time = datetime.now().time()
     purchase_time = current_time.strftime('%H:%M:%S')
-    cursor.execute(ins, (username, ticket_id, type, card_num,card_name,expiration,purchase_date,purchase_time))
+    cursor.execute(ins, (username, ticket_id, type, card_num, card_fname, card_lname, expiration, purchase_date, purchase_time))
     conn.commit()
-    price='SELECT base_price FROM flight WHERE airline_name = %s ' \
-          'AND flight_num = %s AND departure_date =%s AND departure_time = %s'
-    cursor.execute(price,(airline_name,flight_num,  departure_date, departure_time))
-    base_price=cursor['base_price']
-    capacity='SELECT'
-    update = ""
-    cursor.execute(update,())
+    price = 'SELECT base_price FROM flight WHERE airline_name = %s ' \
+            'AND flight_num = %s AND departure_date =%s AND departure_time = %s'
+    cursor.execute(price, (airline_name, flight_num, departure_date, departure_time))
+    data = cursor.fetchone()
+    base_price = data['base_price']
+    capacity = 'SELECT num_seats FROM airplane WHERE airline_name=%s AND airplane_id=%s'
+    cursor.execute(capacity, (airline_name, airplane_id))
+    data = cursor.fetchone()
+    max_passenger = data['num_seats']
+    seats_filled = 'SELECT COUNT(ticket_id) AS total_tickets ' \
+                   'FROM ticket WHERE sold_price IS NOT NULL AND first_name IS NOT NULL ' \
+                   'AND last_name IS NOT NULL AND date_of_birth IS NOT NULL AND airline_name IS NOT NULL ' \
+                   'AND departure_date IS NOT NULL AND departure_time IS NOT NULL'
+    cursor.execute(seats_filled)
+    data = cursor.fetchone()
+    passengers = data['total_tickets']
+    sold_price = base_price
+    if (passengers / max_passenger >= 0.8):
+        sold_price *= 1.25
+    update = 'UPDATE Ticket SET sold_price = %s, first_name = %s, last_name = %s,date_of_birth = %s ' \
+             'WHERE ticket_id = %s AND airline_name = %s AND flight_num = %s ' \
+             'AND departure_date = %s AND departure_time = %s'
+    cursor.execute(update, (
+        sold_price, first, last, birthday, ticket_id, airline_name, flight_num, departure_date, departure_time))
     conn.commit()
-
-    return render_template('purchase.html', flight=flight)
+    return redirect(url_for('home_customer'))
 
 
 @app.route('/logout')
