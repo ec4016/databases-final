@@ -293,8 +293,23 @@ def specific_spending():
 @app.route('/rating', methods=['GET'])
 def rating():
     username = session['username']
-    query = 'SELECT * FROM flight_taken WHERE email=%s'
     cursor = conn.cursor()
+    past="SELECT airline_name,flight_num,departure_date,departure_time " \
+          "FROM ticket NATURAL JOIN purchase " \
+          "WHERE email=%s AND departure_date<CURDATE()"
+    cursor.execute(past, username)
+    taken=cursor.fetchall()
+    for line in taken:
+        ins='INSERT IGNORE INTO flight_taken(email,airline_name,flight_num,departure_date,departure_time, rating, comment)' \
+            'VALUES(%s,%s,%s,%s,%s,NULL,NULL)'
+        airline=line['airline_name']
+        flight_num=line['flight_num']
+        departure_date = line['departure_date']
+        departure_time = line['departure_time']
+        cursor.execute(ins, (username,airline,flight_num,departure_date,departure_time))
+        conn.commit()
+    query = 'SELECT * FROM flight_taken WHERE email=%s'
+
     cursor.execute(query, username)
     flights = cursor.fetchall()
     cursor.close()
