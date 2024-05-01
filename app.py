@@ -522,6 +522,50 @@ def home_staff():
 
 
 
+@app.route('/staffView', methods=['GET', 'POST'])
+def stafftView():
+	cursor = conn.cursor()
+	params = request.form
+	error = None
+	flightType = 'Future'
+
+	query = """SELECT F.*, departureAirport.city AS departure_city, departureAirport.name AS departure_airport_name, arrivalAirport.city AS arrival_city, arrivalAirport.name AS arrival_airport_name
+			FROM Flight
+				F JOIN Airport departureAirport
+				ON F.departure_airport = departureAirport.code
+				JOIN Airport arrivalAirport
+				ON F.arrival_airport = arrivalAirport.code
+			WHERE (F.departure_date > CURRENT_DATE 
+			OR (F.departure_date = CURRENT_DATE AND F.departure_time > CURRENT_TIME)) 
+			AND F.status <> \'Cancelled\'"""
+
+	queries = []
+
+	if 'departure_city' in params and params['departure_city']:
+		query += ' AND departureAirport.city = %s'
+		queries.append(params['departure_city'])
+	if 'arrival_city' in params and params['arrival_city']:
+		query += ' AND arrivalAirport.city = %s'
+		queries.append(params['arrival_city'])
+	if 'departure_airport' in params and params['departure_airport']:
+		query += ' AND departureAirport.code = %s'
+		queries.append(params['departure_airport'])
+	if 'arrival_airport' in params and params['arrival_airport']:
+		query += ' AND arrivalAirport.code = %s'
+		queries.append(params['arrival_airport'])
+	if 'departure_date' in params and params['departure_date']:
+		query += ' AND F.departure_date = %s'
+		queries.append(params['departure_date'])
+
+	cursor.execute(query, queries)
+	data = cursor.fetchall()
+
+	if not data:
+		error = "There are no flights matching these parameters. Please try again!"
+		return render_template('guest.html', flightType=flightType, error=error)
+		
+	cursor.close()
+	return render_template('guest.html', flightType=flightType, error=error, results=data)
 
 
 

@@ -511,6 +511,8 @@ def purchase():
 
     return render_template('purchase.html', flight=flight)
 
+@app.route('/staff_view_flights')
+
 @app.route('/staff_new_flight', methods=['POST'])
 def staff_new_flight():
     print(request.form)
