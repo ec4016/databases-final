@@ -53,6 +53,7 @@ table, th, td{
     background-color: white;
     margin-left: auto;
     margin-right: auto;
+    text-align: center;
 }
 
 table {
@@ -79,6 +80,10 @@ input[type=submit] {
 input[type=submit]:hover {
     background-color: skyblue;
     font-weight: 600;
+}
+
+.error {
+    text-align: center;
 }
 
 /* HOME PAGE */
@@ -179,7 +184,7 @@ input[type=submit]:hover {
     padding-bottom: 40px;
 }
 
-#customer-links {
+#customer-links, #staff-links {
     padding-top: 50px;
     text-align: center;
 }
@@ -187,8 +192,23 @@ input[type=submit]:hover {
     margin: 30px;
 }
 
+#customer-register {
+    border: 1px solid black;
+    border-radius: 15px;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.register-button {
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+
 /* FLIGHT SEARCH */
-.flights-ahead, .return-flights {
+.future-flights {
     margin-bottom: 20px;
 }
 
@@ -206,4 +226,8 @@ input[type=submit]:hover {
 #spending-filter {
     padding-top: 30px;
     text-align: center;
+}
+
+.date-labels {
+    margin-top: -18px;
 }
