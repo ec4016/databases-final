@@ -1,0 +1,51 @@
+SELECT ticket_id, airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, status, airplane_id, departure_airport, arrival_airport, sold_price, first_name, last_name
+FROM flight NATURAL JOIN ticket NATURAL JOIN purchase
+WHERE email= 'test1@gmail.com'
+
+SELECT F.* 
+FROM Flight F
+NATURAL JOIN Ticket
+NATURAL JOIN purchase
+NATURAL JOIN customer
+WHERE purchase.email = 'test1@gmail.com' AND (F.departure_date < CURRENT_DATE OR (F.departure_date = CURRENT_DATE AND F.departure_time < CURRENT_TIME))
+
+
+SELECT F.* 
+FROM Flight F
+JOIN Ticket T ON F.airline_name = T.airline_name AND F.flight_num = T.flight_num
+JOIN Purchase P ON T.ticket_id = P.ticket_id
+JOIN Customer C ON P.customer_id = C.customer_id
+WHERE C.email = 'test1@gmail.com' 
+AND (F.departure_date < CURRENT_DATE OR (F.departure_date = CURRENT_DATE AND F.departure_time < CURRENT_TIME));
+
+
+@app.route('/rating', methods=['GET'])
+def rating():
+    username = session['username']
+    cursor = conn.cursor()
+
+    customer = 'SELECT first_name from customer where email=%s'
+    cursor.execute(customer, (username))
+    customerData = cursor.fetchone()
+    fname = customerData['first_name']
+
+    query = 'SELECT F.airline_name, F.flight_num, F.departure_date, F.departure_time FROM Flight F JOIN Ticket T ON F.airline_name = T.airline_name AND F.flight_num = T.flight_num JOIN Purchase P ON T.ticket_id = P.ticket_id JOIN Customer C ON P.email = C.email WHERE C.email = %s AND (F.departure_date < CURRENT_DATE OR (F.departure_date = CURRENT_DATE AND F.departure_time < CURRENT_TIME))'
+    
+    cursor.execute(query, username)
+    flights = cursor.fetchall()
+
+    print(flights)
+
+    
+    for i in range(len(flights)):
+        ins = "INSERT INTO Flight_Taken (email, airline_name, flight_num, departure_date, departure_time, rating, comment) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        cursor.execute(ins, (username, flights[i]['airline_name'], flights[i]['flight_num'], flights[i]['departure_date'], flights[i]['departure_time'], 'N/A', 'N/A'))
+
+    cursor.close()
+    flight_error = None
+    
+    if (flights):
+        return render_template('rating.html', username=fname, flights=flights)
+    else:
+        flight_error = "You have not taken any flights"
+        return render_template('rating.html', username=fname, flight_error=flight_error)

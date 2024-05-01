@@ -587,7 +587,11 @@ def change_flight_status():
     status = request.args.get('status')
 
     username = session['username']
+    airline_name = request.form['airline_num']
     flight_num = request.form['flight_num']
+    #departure_date = request.form['departure_date']
+    #departure_time = request.form['departure_time']
+
     cursor = conn.cursor()
     query = 'SELECT flight_num FROM flight WHERE flight_num=%s'
     cursor.execute(query, (username, flight_num))
@@ -597,7 +601,7 @@ def change_flight_status():
     #cursor.execute(flights, username)
     flightdata = cursor.fetchall()
     if (data):
-        time_query = 'SELECT departure_date, departure_time FROM ticket WHERE ticket_id=%s'
+        time_query = 'SELECT * FROM flight WHERE airline_name = %s AND flight_number = %s AND departure_date_time = %s'
         cursor.execute(time_query, flight_num)
         timedata = cursor.fetchone()
         date = timedata['departure_date']
@@ -608,8 +612,11 @@ def change_flight_status():
         departure_date_time = datetime.combine(date, time)
         now = datetime.now()
         if ((departure_date_time - now) > timedelta(hours=0)):
-            update = "UPDATE Flight SET status=%s" \
-                     "WHERE flight_num=%s"
+            update = """UPDATE Flight SET status=%s
+                    WHERE flight_num=%s
+                    AND flight_nim = %s
+                    AND departure_date = %s
+                    AND departure_time = %s"""
             cursor.execute(update, flight_num)
             conn.commit()
             cursor.close()
@@ -618,7 +625,7 @@ def change_flight_status():
             return render_template('', change_error=change_error, username=username,
                                    flights=flightdata)
     else:
-        change_error = "Flight does not exist."
+        change_error = "Missing Field"
         return render_template('', change_error=change_error, username=username, flights=flightdata)
 
 @app.route('/staff_new_airplane', methods=['POST'])
