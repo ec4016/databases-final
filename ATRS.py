@@ -713,10 +713,6 @@ def staff_new_airport():
         error = "Data inputted incorrectly."
         return render_template('staff_new_airport.html', error=error)
 
-@app.route('/view_ratings')
-def view_ratings():
-    data = None;
-
 @app.route('/logout')
 def logout():
     session.pop('username')
