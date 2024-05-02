@@ -471,7 +471,7 @@ def staffLoginAuth():
     error = None
     if (data):
         session['username'] = username
-        return render_template('staff_home.html', error=error)
+        return redirect(url_for('staff_home'))
     else:
         error = 'Invalid login or username'
         return render_template('staff_login.html', error=error)
