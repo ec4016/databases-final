@@ -17,7 +17,6 @@
 		</div>
         
         {% if flight %}
-        <h2>Purchase Flight</h2>
         <table>
             <th>Airline</th>
             <th>Flight Number</th>
@@ -43,7 +42,7 @@
         </table>
         {% endif %}
 
-        
+        <h2>Purchase Flight</h2>
         <form action="/purchase_flight" method="POST">
             <div id="purchase-fields">
                 <h2>Passenger Information</h2>
@@ -53,8 +52,7 @@
                 <h2>Card Information</h2>
                 <label><input type="radio" name="type" value="Credit" required/> credit </label>
                 <label><input type="radio" name="type" value="Debit" required/>debit </label></br>
-                <input type="text" name="card_fname" placeholder="Cardholder First Name" required/>
-                <input type="text" name="card_lname" placeholder="Cardholder Last Name" required/>
+                <input type="text" name="card_name" placeholder="Cardholder Name" required/>
                 <input type="text" name="card_num" placeholder="Card Number" required/>
                 <label>Expiration Date:<input type="date" name="expiration" placeholder="Departure Date" required/></label></br>
                 <input type="submit" value="Book"/><br>

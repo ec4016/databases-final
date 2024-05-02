@@ -73,14 +73,41 @@
 				</form>
 			</div>
 		</div>
-	
-
+	<form action="/see_rating" method="POST">
+    <h2>See Reviews for This Flight</h2>
+    <input type="text" name="airline" placeholder="Airline Name" required/></br>
+    <input type="text" name="flight_num" placeholder="Flight Number" required/></br>
+    <input type="date" name="departure_date" placeholder="Departure Date" required/></br>
+    <input type="time" name="departure_time" placeholder="Departure Time" required/></br>
+    <input type="submit" value="Search"/><br>
+</form>
+<form action="/maintenance" method="POST">
+	<h2>Maintenance</h2>>
+    <h3>Plane Information</h3>
+    <input type="text" name="airline" placeholder="Airline Name" required/></br>
+    <input type="text" name="plane_id" placeholder="Airplane ID" required/></br>
+    <h3>Schedule Time</h3>
+    <label>Start Date:<input type="date" name="start_date" required/></label></br>
+    <label>Start Time:<input type="time" name="start_time" required/></label></br>
+    <label>End Date:<input type="date" name="end_date" required/></label></br>
+    <label>End Time:<input type="time" name="end_time" required/></label></br>
+    <input type="submit" value="Schedule"/><br>
+    {% if maintenance_error %}
+    <div class="error"><strong>Error:</strong> {{maintenance_error}}</div>
+    {% endif %}
+</form>
+		<form action="/search_customer" method="POST">
+    <h2>Search For Customer</h2>
+    <input type="text" name="email" placeholder="Customer Email" required/></br>
+    <input type="submit" value="Search"/><br>
+</form>
+		<h4>{{name}} is our most frequent customer with {{ticket_num}} tickets purchased last year</h4>
+		<h4>Year Revenue: {{year}}</h4>
+		<h4>Month Revenue: {{month}}</h4>
 		<div id="staff-links">
-			<a href="/staff_edit_flights">Edit Flights</a>
+			<a href="/edit_flights">Edit Flights</a>
 			<span class="space"></span>
 			<a href="/add_airplane_and_airport">Add Airplane/Airport</a>
-			<span class="space"></span>
-			<a href="/maintenance">Schedule Maintenance</a>
 			<span class="space"></span>
 			<a href="/view_customer_report">View Ratings/Frequent Customers</a>
 			<span class="space"></span>

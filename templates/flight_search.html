@@ -112,22 +112,20 @@
             <div class="error"><strong>Error:</strong> {{returnError}}</div><br>
         {% endif %}
 
-        <form action="/get_purchase" method="POST">
-            <div id="book-flight">
-                <h2>Book a Flight!</h2>
-                <input type="text" name="airline" placeholder="Airline Name" required/>
-                <input type="text" name="flight_num" placeholder="Flight Number" required/>
-                Departure Date: <input type="date" name="departure_date" placeholder="Departure Date" required/>
-                Departure Time: <input type="time" name="departure_time" placeholder="Departure Time" required/>
-                <input type="submit" value="Book This Flight"/><br>
-                {% if flight_error %}
-                <div class="error"><strong>Error:</strong> {{flight_error}}</div>
-                {% endif %}
-            </div>
-            
-        </form>
-
-        <a id="back-button" href="customer_home">Go Back</a>
-
+<form action="/get_purchase" method="POST">
+    <h2>Book a Flight!</h2>
+    <input type="text" name="airline" placeholder="Airline Name" required/></br>
+    <input type="text" name="flight_num" placeholder="Flight Number" required/></br>
+    <input type="date" name="departure_date" placeholder="Departure Date" required/></br>
+    <input type="time" name="departure_time" placeholder="Departure Time" required/></br>
+    <input type="submit" value="Book This Flight"/><br>
+    {% if flight_error %}
+    <div class="error"><strong>Error:</strong> {{flight_error}}</div>
+    {% endif %}
+</form>
+        <div id="flight-search-links">
+            <div><a id="back-button" href="customer_home">Go Back</a></div>
+			<div id="purchase-page"><a href="purchase">Purchase Flights</a></div>
+		</div>
     </body>
 </html>
