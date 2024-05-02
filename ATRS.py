@@ -582,16 +582,24 @@ def staff_new_flight():
 
     error = None
     if(data):
-        ins="INSERT INTO flight (airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, base_price, status, airplane_id, departure_airport, arrival_airport) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        cursor.execute(ins, (airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, base_price, status, airplane_id, departure_airport, arrival_airport))
-        conn.commit()
-        cursor.close()
+        check1 = """SELECT country FROM Airport WHERE code = %(departure_airport)s"""
+        check2 = """SELECT country FROM Airport WHERE code = %(arrival_airport)s"""
+        cursor.execute(check1)
+        result1 = cursor.fetchone()
+        cursor.execute(check2)
+        result2 = cursor.fetchone()
 
-        seats_query = """SELECT num_seats FROM Airplane WHERE airplane_id = %s"""
-        cursor.execute(seats_query)
-        seats_data = cursor.fetchone()
-        num_seats = data["num_seats"]
-        generate_tickets(num_seats)
+        if (result1["country"] == result2["country"]):
+            ins="INSERT INTO flight (airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, base_price, status, airplane_id, departure_airport, arrival_airport) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            cursor.execute(ins, (airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, base_price, status, airplane_id, departure_airport, arrival_airport))
+            conn.commit()
+            cursor.close()
+
+            seats_query = """SELECT num_seats FROM Airplane WHERE airplane_id = %s"""
+            cursor.execute(seats_query)
+            seats_data = cursor.fetchone()
+            num_seats = data["num_seats"]
+            generate_tickets(num_seats)
     
     else:
         error = "Data inputted incorrectly."
