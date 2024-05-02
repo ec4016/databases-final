@@ -654,7 +654,7 @@ def staff_new_airplane():
 
     error = None
     if(data):
-        ins="INSERT INTO flight (airline_name, airplane_id, num_seats, manufacturer, model_number, manufacturing_date, age) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        ins="INSERT INTO Airplane (airline_name, airplane_id, num_seats, manufacturer, model_number, manufacturing_date, age) VALUES (%s, %s, %s, %s, %s, %s, %s)"
         cursor.execute(ins, (airline_name, airplane_id, num_seats, manufacturer, model_number, manufacturing_date, age))
         conn.commit()
         cursor.close()
@@ -687,7 +687,7 @@ def staff_new_airport():
 
     error = None
     if(data):
-        ins="INSERT INTO flight (code, name, city, country, num_terminals, type) VALUES (%s, %s, %s, %s, %s, %s)"
+        ins="INSERT INTO Airport (code, name, city, country, num_terminals, type) VALUES (%s, %s, %s, %s, %s, %s)"
         cursor.execute(ins, (code, name, city, country, num_terminals, type))
         conn.commit()
         cursor.close()
