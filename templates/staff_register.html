@@ -15,20 +15,25 @@
 		</div>
 
         <form action="/staffRegisterAuth" method="POST">
-            <input type="text" name="username" placeholder="Username" required/></br>
-            <input type="password" name="password" placeholder="Password" required/></br>
-            <input type="text" name="primary_email" placeholder="Primary Email" required/> </br>
-            <input type="text" name="first_name" placeholder="First Name" required/></br>
-            <input type="text" name="last_name" placeholder="Last Name" required/></br>
-            <input type="date" name="date_of_birth" placeholder="Date of Birth" required/></br>
-            <input type="text" name="airline_name" placeholder="Airline Name" required/></br>
-            <input type="submit" value ="Register"/>
-
-            {% if error %}
-                <p class="error"><strong>Error:</strong> {{error}}</p>
-            {% endif %}
+            <div id="staff-register">
+                <h4 class="staff-register-labels">Login:</h4>
+                <input type="text" name="username" placeholder="Username" required/>
+                <input type="password" name="password" placeholder="Password" required/></br>
+                <h4 class="staff-register-labels">Name and Date of Birth:</h4>
+                <input type="text" name="first_name" placeholder="First Name" required/>
+                <input type="text" name="last_name" placeholder="Last Name" required/>
+                <input type="date" name="date_of_birth" placeholder="Date of Birth" required/><br>
+                <h4 class="staff-register-labels">Email and Airline Name:</h4>
+                <input type="text" name="primary_email" placeholder="Primary Email" required/>
+                <input type="text" name="airline_name" placeholder="Airline Name" required/></br>
+                <input class="register-button" type="submit" value ="Register"/>
+                {% if error %}
+                    <p class="error"><strong>Error:</strong> {{error}}</p>
+                {% endif %}
+            </div>
+            
         </form>
         
-        <a href="/">Go Back</a><br>
+        <a id="back-button" href="/">Go Back</a><br>
     </body>
 </html>

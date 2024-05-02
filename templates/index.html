@@ -1,14 +1,51 @@
 <!DOCTYPE html>
 <html>
-<head>
-</head>
-<body>
-{% if not message %}
-<a href="/login_customer">Login as Customer</a>
-<a href="/register_customer">Register as Customer</a>
-<a href="/login_staff">Login as Staff</a>
-<a href="/register_staff">Register as Staff</a>
-<a href="/view_flights">View Flight Information</a>
-{% endif %}
-</body>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="static\styles.css">
+
+		<title>Soar on Cloud 9</title>
+	</head>
+
+	<body id="homepage">
+		<div>
+			<h1>
+				<img id="cloud1" src="static\cloud.jpg" width="200px">
+				Soar on Cloud 9
+				<img id="airplane" src="static\airplane.png" width="200px">
+			</h1>
+		</div>
+
+	{% if not message %}
+
+		<div class="logins">
+			<div id="customer">
+				<h3>Customer</h3>
+				<img src="static\customer.png" width="200px">
+				<br><br><br>
+				<a id="customer_login" href="/customer_login">Login</a>
+				<br><br>
+				<a id="customer_register" href="/customer_register">Register</a>
+			</div>
+			
+			<div id="staff">
+				<h3>Staff</h3>
+				<img src="static\staff.png" width="250px">
+				<br>
+				<a id="staff_login" href="/staff_login">Login</a>
+				<br><br>
+				<a id="staff_register" href="/staff_register">Register</a>
+			</div>
+		</div>
+		
+		<div id="guest">
+				<a href="/guest">Continue as Guest</a>	
+		</div>
+		
+	{% endif %}
+
+	</body>
+
 </html>

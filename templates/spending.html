@@ -1,36 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <h1>Total Spendings:</h1>
-    <h2>you spent a total of {{total_spending}}$ in the last 6 months</h2>
-    <h2>Monthly Breakdown</h2>
-    <style type="text/css">
-	table, th, td{
-		border: 1px solid black;
-	}
-</style>
-<table>
-	<th>Month</th>
-	<th>Dollars Spent</th>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel = "stylesheet" href="static\styles.css"/>
+        <title>My Spendings</title>
+    </head>
 
-{% for line in monthly %}
-	<tr>
-		<td>{{line['month']}}</td>
-		<td>{{line['month_spending']}}</td>
-	</tr>
-{% endfor %}
-</table>
-    <form action="/specific_spending" method="POST">
-        Start Date: <input type="date" name="start" required>
-        End Date: <input type="date" name="end"required>
-        <button type="submit">View Expenses</button>
-    </form>
+    <body>
+        <div>
+			<h1>
+				<img id="cloud1" src="static\cloud.jpg" width="200px">
+				My Spendings
+				<img id="airplane" src="static\airplane.png" width="200px">
+			</h1>
+		</div>
 
-    <a href="home_customer">Go back</a>
+        <div id="spendings-container">
+            <h2>Total Spendings:</h2>
+            {% if specific %}
+                <h2>You spent a total of {{total_spending}}$ between<br>{{start}} and {{end}}</h2>
+                
+            {% else %}
+                <h2>You spent a total of {{total_spending}}$ in the last 6 months</h2>
+            {% endif %}
+            <h3>Monthly Breakdown:</h3>
+            
+            <table>
+                <th>Month</th>
+                <th>Dollars Spent</th>
+            
+                {% for line in monthly %}
+                <tr>
+                    <td>{{line['month']}}</td>
+                    <td>{{line['month_spending']}}</td>
+                </tr>
+                {% endfor %}
+            </table>
 
-</head>
-<body>
+            <div id="spending-filter">
+                <form action="/specific_spending" method="POST">
+                    Start Date: <input type="date" name="start" required>
+                    End Date: <input type="date" name="end" required>
+                    <input type="submit" value="View Expenses"/>
 
-</body>
+                    {% if error %}
+                    <p class="error"><strong>Error:</strong> {{error}}</p>
+                    {% endif %}
+                    
+                </form>
+            </div>
+        </div>
+        
+        <a id="back-button" href="customer_home">Go Back</a><br>
+    <body>
 </html>

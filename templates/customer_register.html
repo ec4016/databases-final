@@ -14,29 +14,37 @@
 			</h1>
 		</div>
 
-        <form action="/customerRegisterAuth" method="POST">
-            <input type="text" name="email" placeholder="Email" required/> </br>
-            <input type="password" name="password" placeholder="Password" required/></br>
-            <input type="text" name="first_name" placeholder="First Name" required/> </br>
-            <input type="text" name="last_name" placeholder="Last Name" required/> </br>
-            <input type="text" name="building_num" placeholder="Building Number" required/> </br>
-            <input type="text" name="street" placeholder="Street" required/> </br>
-            <input type="text" name="apartment_num" placeholder="Apartment Number" required/> </br>
-            <input type="text" name="city" placeholder="City" required/> </br>
-            <input type="text" name="state" placeholder="State" required/> </br>
-            <input type="text" name="zip_code" placeholder="Zip Code" required/> </br>
-            <input type="text" name="primary_phone_number" placeholder="Primary Phone Number" required/> </br>
-            <input type="text" name="passport_number" placeholder="Passport Number" required/> </br>
-            <input type="date" name="passport_expiration_date" placeholder="Passport Expiration Date" required/> </br>
-            <input type="text" name="passport_country" placeholder="Passport Country" required/> </br>
-            <input type="date" name="date_of_birth" placeholder="Date of Birth" required/> </br>
-            <input type="submit" value=Register/>
-
-            {% if error %}
-                <p class="error"><strong>Error:</strong> {{error}}</p>
-            {% endif %}
-        </form>
+            <form action="/customerRegisterAuth" method="POST">
+                <div id="customer-register">
+                    <h4 class="customer-register-labels">Login:</h4>
+                    <input type="text" name="email" placeholder="Email" required/>
+                    <input type="password" name="password" placeholder="Password" required/>
+                    <input type="text" name="primary_phone_number" placeholder="Primary Phone Number" required/><br>
+                    <h4 class="customer-register-labels">Name and Date of Birth:</h4>
+                    <input type="text" name="fname" placeholder="First Name" required/>
+                    <input type="text" name="lname" placeholder="Last Name" required/>
+                    <input type="date" name="date_of_birth" placeholder="Date of Birth" required/> </br>
+                    <h4 class="customer-register-labels">Address:</h4>
+                    <input type="text" name="street" placeholder="Street" required/>
+                    <input type="text" name="building_num" placeholder="Building Number" required/>
+                    <input type="text" name="apartment_num" placeholder="Apartment Number" required/></br>
+                    <input type="text" name="city" placeholder="City" required/>
+                    <input type="text" name="state" placeholder="State" required/>
+                    <input type="text" name="zip_code" placeholder="Zip Code" required/> </br>
+                    <h4 class="customer-register-labels">Passport Info:</h4>
+                    <input type="text" name="passport_number" placeholder="Passport Number" required/>
+                    <input type="text" name="passport_country" placeholder="Passport Country" required/>
+                    <input type="date" name="passport_expiration_date" placeholder="Passport Expiration Date" required/> <br>
+                    <input class="register-button" type="submit" value="Register"/>
         
-        <a href="/">Go Back</a><br>
+                    {% if error %}
+                        <p class="error"><strong>Error:</strong> {{error}}</p>
+                    {% endif %}
+                </div>
+            </form>
+        
+        
+        
+        <a id="back-button" href="/">Go Back</a><br>
     </body>
 </html>

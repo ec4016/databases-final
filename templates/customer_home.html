@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel = "stylesheet" href="static\styles.css"/>
+        <title>Customer Login</title>
+    </head>
+
+    <body>
+		<div>
+			<h1>
+				<img id="cloud1" src="static\cloud.jpg" width="200px">
+				Welcome {{username}}!
+				<img id="airplane" src="static\airplane.png" width="200px">
+			</h1>
+		</div>
+
+		{% if flights %}
+		<h2>My Flights</h2>
+		<table>
+			<th>Ticket ID</th>
+			<th>Airline</th>
+			<th>Flight Number</th>
+			<th>Plane ID</th>
+			<th>Passenger First Name</th>
+			<th>Passenger Last Name</th>
+			<th>Departure Date</th>
+			<th>Departure Time</th>
+			<th>Arrival Date</th>
+			<th>Arrival Time</th>
+			<th>Departure Airport</th>
+			<th>Arrival Airport</th>
+			<th>Status</th>
+			<th>Price</th>
+
+		{% for line in flights %}
+			<tr>
+				<td>{{line['ticket_id']}}</td>
+				<td>{{line['airline_name']}}</td>
+				<td>{{line['flight_num']}}</td>
+				<td>{{line['airplane_id']}}</td>
+				<td>{{line['first_name']}}</td>
+				<td>{{line['last_name']}}</td>
+				<td>{{line['departure_date']}}</td>
+				<td>{{line['departure_time']}}</td>
+				<td>{{line['arrival_date']}}</td>
+				<td>{{line['arrival_time']}}</td>
+				<td>{{line['departure_airport']}}</td>
+				<td>{{line['arrival_airport']}}</td>
+				<td>{{line['status']}}</td>
+				<td>{{line['sold_price']}}</td>
+			</tr>
+		{% endfor %}
+		</table>
+
+		<div class="customer-settings">
+			<div id="add-phone-nums">
+				<form action="/cust_add_num" method="POST">
+					<h2>Add Phone Numbers</h2>
+					<input type="text" name = "phonenumber" placeholder="Phone Number" required/>
+					<input type="submit" value = Add />
+					{% if phone_error %}
+						<p class="error"><strong>Error:</strong> {{phone_error}}</p>
+					{% endif %}
+				</form>
+			</div>
+			
+			<div id="cancel-flights">
+				<h2>Cancel Flights</h2>
+				<form action="/cancel_flight" method="POST">
+					<input type="text" name="ticket_id" placeholder="Ticket ID" required />
+					<input type="submit" value="Cancel Ticket" />
+					{% if cancel_error %}
+						<p class="error"><strong>Error:</strong> {{cancel_error}}</p>
+					{% endif %}
+				</form>
+			</div>
+		</div>
+		
+		<div id="customer-links">
+			<a href="/flight_search">Flight Search</a>
+			<span class="space"></span>
+			<a href="/rating">Rate a Previous Flight</a>
+			<span class="space"></span>
+			<a href="/spending">Track My Spendings</a>
+			<span class="space"></span>
+			<a href="/logout">Logout</a>
+		</div>
+		
+		{% endif %}
+    </body>
+</html>

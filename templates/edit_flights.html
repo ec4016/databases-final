@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel = "stylesheet" href="static\styles.css"/>
+        <title>Edit Flights</title>
+    </head>
+
+    <body>
+		<div>
+			<h1>
+				<img id="cloud1" src="static\cloud.jpg" width="200px">
+				Welcome {{username}}!
+				<img id="airplane" src="static\airplane.png" width="200px">
+			</h1>
+		</div>
+
+		<form action="/staff_new_airplane" method="post">
+            <label for="airline_name">Airline Name:</label>
+            <input type="text" id="airline_name" name="airline_name" placeholder="Enter airline name">
+            
+            <br>
+        
+            <label for="airplane_id">Airplane ID:</label>
+            <input type="text" id="airplane_id" name="airplane_id" placeholder="Enter airplane ID">
+            <br>
+        
+            <label for="num_seats">Number of Seats:</label>
+            <input type="text" id="num_seats" name="num_seats" placeholder="Enter number of seats">
+            <br>
+        
+            <label for="manufacturer">Manufacturer:</label>
+            <input type="text" id="manufacturer" name="manufacturer" placeholder="Enter manufacturer">
+            <br>
+        
+            <label for="model_number">Model Number:</label>
+            <input type="text" id="model_number" name="model_number" placeholder="Enter model number">
+            <br>
+        
+            <label for="manufacturing_date">Manufacturing Date:</label>
+            <input type="text" id="manufacturing_date" name="manufacturing_date" placeholder="Enter manufacturing date">
+            <br>
+            
+            <button type="submit">Submit</button>
+        </form>
+        
+	
+
+		<div><a id="back-button" href="staff_home">Go Back</a></div>
+
+    </body>
+</html>
