@@ -245,6 +245,17 @@ input[type=submit]:hover {
     margin-top: 20px;
 }
 
+#purchase-fields {
+    border: 1px solid black;
+    border-radius: 15px;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    padding-bottom: 30px;
+    margin-top: 40px;
+}
+
 /* FLIGHT SEARCH */
 .future-flights {
     margin-bottom: 20px;
@@ -278,4 +289,28 @@ input[type=submit]:hover {
     margin-left: auto;
     margin-right: auto;
     text-align: center;
+}
+
+.staff-settings {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "add-phone-nums add-emails";
+    justify-content: space-between;
+    gap: 50px;
+    margin-top: 50px;
+}
+
+#add-phone-nums, #add-emails {
+    border: 1px solid black;
+    border-radius: 15px;
+    text-align: center;
+    padding-bottom: 40px;
+}
+
+#book-flight {
+    border: 1px solid black;
+    border-radius: 15px;
+    text-align: center;
+    padding-bottom: 40px;
+    margin-bottom: 30px;
 }

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel = "stylesheet" href="static\styles.css"/>
+        <title>Staff Homepage</title>
+    </head>
+
+    <body>
+		<div>
+			<h1>
+				<img id="cloud1" src="static\cloud.jpg" width="200px">
+				Welcome {{username}}!
+				<img id="airplane" src="static\airplane.png" width="200px">
+			</h1>
+		</div>
+
+		<form action="/maintenance" method="POST">
+            <h2>Plane Information</h2>
+            <input type="text" name="airline" placeholder="Airline Name" required/></br>
+            <input type="text" name="plane_id" placeholder="Airplane ID" required/></br>
+            <h2>Schedule Time</h2>
+            <label>Start Date:<input type="date" name="start_date" required/></label></br>
+            <label>Start Time:<input type="time" name="start_time" required/></label></br>
+            <label>End Date:<input type="date" name="end_date" required/></label></br>
+            <label>End Time:<input type="time" name="end_time" required/></label></br>
+            <input type="submit" value="Schedule"/><br>
+            {% if maintenance_error %}
+            <div class="error"><strong>Error:</strong> {{maintenance_error}}</div>
+            {% endif %}
+        </form>
+	
+
+		<a id="back-button" href="staff_home">Go Back</a>
+
+    </body>
+</html>

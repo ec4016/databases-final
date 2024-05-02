@@ -1,5 +1,5 @@
 # Import Flask Library
-import hashlib
+import hashlib, random
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, session, url_for, redirect
 import pymysql.cursors
@@ -538,6 +538,16 @@ def purchase():
 
 @app.route('/staff_view_flights')
 
+def generate_tickets(capacity, airline_name, flight_num, departure_time):
+    cursor = conn.cursor
+    for i in range(capacity):
+        ticket_id = random.randint(0, 1000000)
+        ins="INSERT into Ticket (ticket_id, airline_name, flight_num, departure_date, sold_price, first_name, last_name, date_of_birth)"
+        cursor.execute(ins, (ticket_id, airline_name, flight_num, departure_time, None, None, None, None, None))
+        conn.commit()
+    cursor.close()
+
+
 @app.route('/staff_new_flight', methods=['POST'])
 def staff_new_flight():
     print(request.form)
@@ -576,10 +586,17 @@ def staff_new_flight():
         cursor.execute(ins, (airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, base_price, status, airplane_id, departure_airport, arrival_airport))
         conn.commit()
         cursor.close()
+
+        seats_query = """SELECT num_seats FROM Airplane WHERE airplane_id = %s"""
+        cursor.execute(seats_query)
+        seats_data = cursor.fetchone()
+        num_seats = data["num_seats"]
+        generate_tickets(num_seats)
     
     else:
         error = "Data inputted incorrectly."
         return render_template('staff_new_flight.html', error=error)
+
 
 @app.route('/change_flight_status', methods=['GET'])
 def change_flight_status():
@@ -587,7 +604,11 @@ def change_flight_status():
     status = request.args.get('status')
 
     username = session['username']
+    airline_name = request.form['airline_num']
     flight_num = request.form['flight_num']
+    #departure_date = request.form['departure_date']
+    #departure_time = request.form['departure_time']
+
     cursor = conn.cursor()
     query = 'SELECT flight_num FROM flight WHERE flight_num=%s'
     cursor.execute(query, (username, flight_num))
@@ -597,7 +618,7 @@ def change_flight_status():
     #cursor.execute(flights, username)
     flightdata = cursor.fetchall()
     if (data):
-        time_query = 'SELECT departure_date, departure_time FROM ticket WHERE ticket_id=%s'
+        time_query = 'SELECT * FROM flight WHERE airline_name = %s AND flight_number = %s AND departure_date_time = %s'
         cursor.execute(time_query, flight_num)
         timedata = cursor.fetchone()
         date = timedata['departure_date']
@@ -608,8 +629,11 @@ def change_flight_status():
         departure_date_time = datetime.combine(date, time)
         now = datetime.now()
         if ((departure_date_time - now) > timedelta(hours=0)):
-            update = "UPDATE Flight SET status=%s" \
-                     "WHERE flight_num=%s"
+            update = """UPDATE Flight SET status=%s
+                    WHERE flight_num=%s
+                    AND flight_nim = %s
+                    AND departure_date = %s
+                    AND departure_time = %s"""
             cursor.execute(update, flight_num)
             conn.commit()
             cursor.close()
@@ -618,7 +642,7 @@ def change_flight_status():
             return render_template('', change_error=change_error, username=username,
                                    flights=flightdata)
     else:
-        change_error = "Flight does not exist."
+        change_error = "Missing Field"
         return render_template('', change_error=change_error, username=username, flights=flightdata)
 
 @app.route('/staff_new_airplane', methods=['POST'])
@@ -647,7 +671,7 @@ def staff_new_airplane():
 
     error = None
     if(data):
-        ins="INSERT INTO flight (airline_name, airplane_id, num_seats, manufacturer, model_number, manufacturing_date, age) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        ins="INSERT INTO Airplane (airline_name, airplane_id, num_seats, manufacturer, model_number, manufacturing_date, age) VALUES (%s, %s, %s, %s, %s, %s, %s)"
         cursor.execute(ins, (airline_name, airplane_id, num_seats, manufacturer, model_number, manufacturing_date, age))
         conn.commit()
         cursor.close()
@@ -680,7 +704,7 @@ def staff_new_airport():
 
     error = None
     if(data):
-        ins="INSERT INTO flight (code, name, city, country, num_terminals, type) VALUES (%s, %s, %s, %s, %s, %s)"
+        ins="INSERT INTO Airport (code, name, city, country, num_terminals, type) VALUES (%s, %s, %s, %s, %s, %s)"
         cursor.execute(ins, (code, name, city, country, num_terminals, type))
         conn.commit()
         cursor.close()
@@ -688,6 +712,10 @@ def staff_new_airport():
     else:
         error = "Data inputted incorrectly."
         return render_template('staff_new_airport.html', error=error)
+
+@app.route('/view_ratings')
+def view_ratings():
+    data = None;
 
 @app.route('/logout')
 def logout():
