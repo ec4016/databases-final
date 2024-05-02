@@ -1,5 +1,5 @@
 # Import Flask Library
-import hashlib
+import hashlib, random
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, session, url_for, redirect
 import pymysql.cursors
@@ -538,6 +538,16 @@ def purchase():
 
 @app.route('/staff_view_flights')
 
+def generate_tickets(capacity, airline_name, flight_num, departure_time):
+    cursor = conn.cursor
+    for i in range(capacity):
+        ticket_id = random.randint(0, 1000000)
+        ins="INSERT into Ticket (ticket_id, airline_name, flight_num, departure_date, sold_price, first_name, last_name, date_of_birth)"
+        cursor.execute(ins, (ticket_id, airline_name, flight_num, departure_time, None, None, None, None, None))
+        conn.commit()
+    cursor.close()
+
+
 @app.route('/staff_new_flight', methods=['POST'])
 def staff_new_flight():
     print(request.form)
@@ -576,10 +586,17 @@ def staff_new_flight():
         cursor.execute(ins, (airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, base_price, status, airplane_id, departure_airport, arrival_airport))
         conn.commit()
         cursor.close()
+
+        seats_query = """SELECT num_seats FROM Airplane WHERE airplane_id = %s"""
+        cursor.execute(seats_query)
+        seats_data = cursor.fetchone()
+        num_seats = data["num_seats"]
+        generate_tickets(num_seats)
     
     else:
         error = "Data inputted incorrectly."
         return render_template('staff_new_flight.html', error=error)
+
 
 @app.route('/change_flight_status', methods=['GET'])
 def change_flight_status():
@@ -695,6 +712,10 @@ def staff_new_airport():
     else:
         error = "Data inputted incorrectly."
         return render_template('staff_new_airport.html', error=error)
+
+@app.route('/view_ratings')
+def view_ratings():
+    data = None;
 
 @app.route('/logout')
 def logout():
