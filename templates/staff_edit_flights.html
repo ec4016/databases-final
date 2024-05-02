@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel = "stylesheet" href="static\styles.css"/>
+        <title>Edit Flights</title>
+    </head>
+
+    <body>
+		<div>
+			<h1>
+				<img id="cloud1" src="static\cloud.jpg" width="200px">
+				Welcome {{username}}!
+				<img id="airplane" src="static\airplane.png" width="200px">
+			</h1>
+		</div>
+	
+        <h2>Create New Flight</h2>
+        <form action="/staff_new_flight" method="post">
+            <label for="airline_name">Airline Name:</label>
+            <input type="text" id="airline_name" name="airline_name" placeholder="Enter airline name">
+            
+            <br>
+        
+            <label for="flight_num">Flight Number:</label>
+            <input type="text" id="flight_num" name="flight_num" placeholder="Enter flight number">
+            <br>
+        
+            <label for="departure_date">Departure Date:</label>
+            <input type="date" id="departure_date" name="departure_date" placeholder="Enter departure date">
+            <br>
+        
+            <label for="departure_time">Departure Time:</label>
+            <input type="time" id="departure_time" name="departure_time" placeholder="Enter departure time">
+            <br>
+        
+            <label for="arrival_date">Arrival Date:</label>
+            <input type="date" id="arrival_date" name="arrival_date" placeholder="Enter arrival date">
+            <br>
+        
+            <label for="arrival_time">Arrival Time:</label>
+            <input type="time" id="arrival_time" name="arrival_time" placeholder="Enter arrival time">
+            <br>
+        
+            <label for="base_price">Base Price:</label>
+            <input type="text" id="base_price" name="base_price" placeholder="Enter base price">
+            <br>
+        
+            <label for="status">Status:</label>
+            <input type="text" id="status" name="status" placeholder="Enter status">
+            <br>
+        
+            <label for="airplane_id">Airplane ID:</label>
+            <input type="text" id="airplane_id" name="airplane_id" placeholder="Enter airplane ID">
+            <br>
+        
+            <label for="departure_airport">Departure Airport:</label>
+            <input type="text" id="departure_airport" name="departure_airport" placeholder="Enter departure airport">
+            <br>
+        
+            <label for="arrival_airport">Arrival Airport:</label>
+            <input type="text" id="arrival_airport" name="arrival_airport" placeholder="Enter arrival airport">
+            <br>
+        
+            <button type="submit">Submit</button>
+        </form>
+
+		<a id="back-button" href="staff_home">Go Back</a>
+
+    </body>
+</html>

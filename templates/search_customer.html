@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Customer</title>
+    {% if error %}
+    <p class="error"><strong>Error:</strong> {{error}}</p>
+    {% else %}
+    <h2>{{email}} Flights</h2>
+    {% if flights %}
+    <style type="text/css">
+	table, th, td{
+		border: 1px solid black;
+	}
+    </style>
+    <table>
+        <th>Ticket ID</th>
+        <th>Airline</th>
+        <th>Flight Number</th>
+        <th>Plane ID</th>
+        <th>Passenger First Name</th>
+        <th>Passenger Last Name</th>
+        <th>Departure Date</th>
+        <th>Departure Time</th>
+        <th>Arrival Date</th>
+        <th>Arrival Time</th>
+        <th>Departure Airport</th>
+        <th>Arrival Airport</th>
+        <th>Status</th>
+        <th>Price</th>
+
+        {% for line in flights %}
+        <tr>
+            <td>{{line['ticket_id']}}</td>
+            <td>{{line['airline_name']}}</td>
+            <td>{{line['flight_num']}}</td>
+            <td>{{line['airplane_id']}}</td>
+            <td>{{line['first_name']}}</td>
+            <td>{{line['last_name']}}</td>
+            <td>{{line['departure_date']}}</td>
+            <td>{{line['departure_time']}}</td>
+            <td>{{line['arrival_date']}}</td>
+            <td>{{line['arrival_time']}}</td>
+            <td>{{line['departure_airport']}}</td>
+            <td>{{line['arrival_airport']}}</td>
+            <td>{{line['status']}}</td>
+            <td>{{line['sold_price']}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {%else%}
+    <h2>No Flights Found</h2>
+    {% endif %}
+    {% endif %}
+</head>
+<body>
+
+</body>
+</html>

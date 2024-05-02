@@ -1,5 +1,5 @@
 # Import Flask Library
-import hashlib
+import hashlib, random
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, session, url_for, redirect
 import pymysql.cursors
@@ -932,10 +932,8 @@ def purchase_flight():
 
 # @app.route('/maintenance')
 # def maintenance():
-#     airline = request.form['airline']
-#     flight_num = request.form['flight_num']
-#     departure_date = request.form['departure_date']
-#     departure_time = request.form['departure_time']
+#     airline = request.form['airline_name']
+#     plane_id = request.form['plane_id']
 #     start_date = request.form['start_date']
 #     start_time = request.form['start_time']
 #     end_date = request.form['end_date']
@@ -948,20 +946,82 @@ def purchase_flight():
 #     maintenance_error=None
 
 #     if(exist):
-#         ins='INSERT INTO maintenance (airplane_id,start_date,start_time,end_date,end_time)' \
+#         ins='INSERT INTO maintenance (airline_name,airplane_id,start_date,start_time,end_date,end_time)' \
 #             'VALUES (%s,%s,%s,%s,%s)' \
 #             'ON DUPLICATE KEY UPDATE' \
-#             'airplane_id=%s,start_date=%s,start_time=%s,end_date=%s,end_time=%s'
+#             'airline_name=%s,airplane_id=%s,start_date=%s,start_time=%s,end_date=%s,end_time=%s'
 #         airplane_id=exist['airplane_id']
-#         cursor.execute(ins,(airplane_id,start_date,start_time,end_date,end_time,
+#         cursor.execute(ins,(airline,airplane_id,start_date,start_time,end_date,end_time,airline,
 #                             airplane_id,start_date,start_time,end_date,end_time))
 #         conn.commit()
 #         return render_template('staff_home.html')
 #     else:
 #         cursor.close()
 #         maintenance_error="Flight Not Found"
-#         return render_template('staff_home.html', maintenance_error=maintenance_error)
+#         return render_template('staff_home.html',maintenance_error=maintenance_error)
 
+@app.route('/staff_edit_flights')
+def staff_edit_flights():
+    return render_template('staff_edit_flights.html')
+
+@app.route('/staff_view_flights')
+
+def generate_tickets(capacity, airline_name, flight_num, departure_time):
+    cursor = conn.cursor
+    for i in range(capacity):
+        ticket_id = random.randint(0, 1000000)
+        ins="INSERT into Ticket (ticket_id, airline_name, flight_num, departure_date, sold_price, first_name, last_name, date_of_birth)"
+        cursor.execute(ins, (ticket_id, airline_name, flight_num, departure_time, None, None, None, None, None))
+        conn.commit()
+    cursor.close()
+
+@app.route('/staff_new_flight', methods=['GET', 'POST'])
+def createFlight():
+    airline_name = request.form.get('airline_name')
+    flight_num = request.form.get('flight_num')
+    departure_date = request.form.get('departure_date')
+    departure_time = request.form.get('departure_time')
+    arrival_date = request.form.get('arrival_date')
+    arrival_time = request.form.get('arrival_time')
+    base_price = request.form.get('base_price')
+    status = request.form.get('status')
+    airplane_id = request.form.get('airplane_id')
+    departure_airport = request.form.get('departure_airport')
+    arrival_airport = request.form.get('arrival_airport')
+
+    data = {
+        'airline_name': airline_name,
+        'flight_num' : flight_num,
+        'departure_date': departure_date,
+        'departure_time': departure_time,
+        'arrival_date': arrival_date,
+        'arrival_time': arrival_time,
+        'base_price': base_price,
+        'status': status,
+        'airplane_id': airplane_id,
+        'departure_airport': departure_airport,
+        'arrival_airport': arrival_airport
+    }
+    
+    username = session['username']
+    cursor = conn.cursor()
+
+    error = None
+    if(data):
+        ins="INSERT INTO flight (airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, base_price, status, airplane_id, departure_airport, arrival_airport) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        cursor.execute(ins, (airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, base_price, status, airplane_id, departure_airport, arrival_airport))
+        conn.commit()
+        
+
+        seats_query = """SELECT num_seats FROM Airplane WHERE airplane_id = %s"""
+        cursor.execute(seats_query)
+        seats_data = cursor.fetchone()
+        num_seats = data["num_seats"]
+        generate_tickets(num_seats)
+        cursor.close()
+    else:
+        error = "Data inputted incorrectly."
+        return render_template('staff_edit_flights.html', error=error)
 
 @app.route('/logout')
 def logout():
