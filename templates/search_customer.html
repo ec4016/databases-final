@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel = "stylesheet" href="static\styles.css"/>
+        <title>Search Customer Flights</title>
+    </head>
+
+    <body>
+        <div>
+            <h1>
+                <img id="cloud1" src="static\cloud.jpg" width="200px">
+                Welcome {{username}}!
+                <img id="airplane" src="static\airplane.png" width="200px">
+            </h1>
+        </div>
+        
+        {% if error %}
+        <p class="error"><strong>Error:</strong> {{error}}</p>
+        {% else %}
+
+        <h2>The Flights of Customer {{email}}</h2>
+
+        {% if flights %}
+        <table>
+            <th>Ticket ID</th>
+            <th>Airline</th>
+            <th>Flight Number</th>
+            <th>Plane ID</th>
+            <th>Passenger First Name</th>
+            <th>Passenger Last Name</th>
+            <th>Departure Date</th>
+            <th>Departure Time</th>
+            <th>Arrival Date</th>
+            <th>Arrival Time</th>
+            <th>Departure Airport</th>
+            <th>Arrival Airport</th>
+            <th>Status</th>
+            <th>Price</th>
+
+            {% for line in flights %}
+            <tr>
+                <td>{{line['ticket_id']}}</td>
+                <td>{{line['airline_name']}}</td>
+                <td>{{line['flight_num']}}</td>
+                <td>{{line['airplane_id']}}</td>
+                <td>{{line['first_name']}}</td>
+                <td>{{line['last_name']}}</td>
+                <td>{{line['departure_date']}}</td>
+                <td>{{line['departure_time']}}</td>
+                <td>{{line['arrival_date']}}</td>
+                <td>{{line['arrival_time']}}</td>
+                <td>{{line['departure_airport']}}</td>
+                <td>{{line['arrival_airport']}}</td>
+                <td>{{line['status']}}</td>
+                <td>{{line['sold_price']}}</td>
+            </tr>
+            {% endfor %}
+        </table><br>
+        {%else%}
+        <h2>No Flights Found</h2>
+        {% endif %}
+        {% endif %}
+
+        <a id="back-button" href="staff_home">Go Back</a>
+
+    </body>
+</html>
