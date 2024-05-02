@@ -305,9 +305,18 @@ input[type=submit]:hover {
     border-radius: 15px;
     text-align: center;
     padding-bottom: 40px;
+    margin-bottom: 30px;
 }
 
 #book-flight {
+    border: 1px solid black;
+    border-radius: 15px;
+    text-align: center;
+    padding-bottom: 40px;
+    margin-bottom: 30px;
+}
+
+#see-reviews, #maintenance-filters, #customer-search {
     border: 1px solid black;
     border-radius: 15px;
     text-align: center;

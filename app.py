@@ -474,7 +474,7 @@ def staffLoginAuth():
     error = None
     if (data):
         session['username'] = username
-        return render_template('staff_home.html', username=fname, error=error)
+        return redirect(url_for('staff_home'))
     else:
         error = 'Invalid login or username'
         return render_template('staff_login.html', username=fname, error=error)
@@ -975,53 +975,81 @@ def generate_tickets(capacity, airline_name, flight_num, departure_time):
         conn.commit()
     cursor.close()
 
-@app.route('/staff_new_flight', methods=['GET', 'POST'])
-def createFlight():
-    airline_name = request.form.get('airline_name')
-    flight_num = request.form.get('flight_num')
-    departure_date = request.form.get('departure_date')
-    departure_time = request.form.get('departure_time')
-    arrival_date = request.form.get('arrival_date')
-    arrival_time = request.form.get('arrival_time')
-    base_price = request.form.get('base_price')
-    status = request.form.get('status')
-    airplane_id = request.form.get('airplane_id')
-    departure_airport = request.form.get('departure_airport')
-    arrival_airport = request.form.get('arrival_airport')
+# @app.route('/staff_new_flight', methods=['GET', 'POST'])
+# def createFlight():
+#     airline_name = request.form.get('airline_name')
+#     flight_num = request.form.get('flight_num')
+#     departure_date = request.form.get('departure_date')
+#     departure_time = request.form.get('departure_time')
+#     arrival_date = request.form.get('arrival_date')
+#     arrival_time = request.form.get('arrival_time')
+#     base_price = request.form.get('base_price')
+#     status = request.form.get('status')
+#     airplane_id = request.form.get('airplane_id')
+#     departure_airport = request.form.get('departure_airport')
+#     arrival_airport = request.form.get('arrival_airport')
 
-    data = {
-        'airline_name': airline_name,
-        'flight_num' : flight_num,
-        'departure_date': departure_date,
-        'departure_time': departure_time,
-        'arrival_date': arrival_date,
-        'arrival_time': arrival_time,
-        'base_price': base_price,
-        'status': status,
-        'airplane_id': airplane_id,
-        'departure_airport': departure_airport,
-        'arrival_airport': arrival_airport
-    }
+#     data = {
+#         'airline_name': airline_name,
+#         'flight_num' : flight_num,
+#         'departure_date': departure_date,
+#         'departure_time': departure_time,
+#         'arrival_date': arrival_date,
+#         'arrival_time': arrival_time,
+#         'base_price': base_price,
+#         'status': status,
+#         'airplane_id': airplane_id,
+#         'departure_airport': departure_airport,
+#         'arrival_airport': arrival_airport
+#     }
     
-    username = session['username']
+#     username = session['username']
+#     cursor = conn.cursor()
+
+#     error = None
+#     if(data):
+#         ins="INSERT INTO flight (airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, base_price, status, airplane_id, departure_airport, arrival_airport) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+#         cursor.execute(ins, (airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, base_price, status, airplane_id, departure_airport, arrival_airport))
+#         conn.commit()
+#         cursor.close()
+
+#         seats_query = """SELECT num_seats FROM Airplane WHERE airplane_id = %s"""
+#         cursor.execute(seats_query)
+#         seats_data = cursor.fetchone()
+#         num_seats = data["num_seats"]
+#         generate_tickets(num_seats)
+    
+#     else:
+#         error = "Data inputted incorrectly."
+#         return render_template('staff_edit_flights.html', error=error)
+
+
+@app.route('/see_rating', methods=['POST'])
+def see_rating():
     cursor = conn.cursor()
+    username = session['username']
+    flight_num = request.form['flight_num']
+    departure_date = request.form['departure_date']
+    departure_time = request.form['departure_time']
+    get_airline = 'SELECT airline_name FROM staff WHERE username=%s'
+    cursor.execute(get_airline, username)
+    data = cursor.fetchone()
+    airline = data['airline_name']
+    avg = 'SELECT AVG(rating) AS average_rating FROM flight_taken ' \
+          "WHERE airline_name = %s AND flight_num = %s AND departure_date = %s AND HOUR(departure_time) = HOUR(%s)"
+    cursor.execute(avg, (airline, flight_num, departure_date, departure_time))
+    data = cursor.fetchone()
+    average_rating = data['average_rating']
+    query = 'SELECT comment FROM Flight_Taken ' \
+            'WHERE airline_name = %s AND flight_num = %s AND departure_date = %s ' \
+            "AND HOUR(departure_time) = HOUR(%s) AND comment IS NOT NULL"
+    cursor.execute(query, (airline, flight_num, departure_date, departure_time))
+    comments = cursor.fetchall()
+    return render_template('see_rating.html', comments=comments, average_rating=average_rating)
 
-    error = None
-    if(data):
-        ins="INSERT INTO flight (airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, base_price, status, airplane_id, departure_airport, arrival_airport) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        cursor.execute(ins, (airline_name, flight_num, departure_date, departure_time, arrival_date, arrival_time, base_price, status, airplane_id, departure_airport, arrival_airport))
-        conn.commit()
-        
-
-        seats_query = """SELECT num_seats FROM Airplane WHERE airplane_id = %s"""
-        cursor.execute(seats_query)
-        seats_data = cursor.fetchone()
-        num_seats = data["num_seats"]
-        generate_tickets(num_seats)
-        cursor.close()
-    else:
-        error = "Data inputted incorrectly."
-        return render_template('staff_edit_flights.html', error=error)
+@app.route('/add_airplane_and_airport')
+def add_airplane_and_airport():
+    return render_template('add_airplane_and_airport.html')
 
 @app.route('/logout')
 def logout():
