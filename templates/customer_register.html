@@ -14,16 +14,16 @@
 			</h1>
 		</div>
 
-       
             <form action="/customerRegisterAuth" method="POST">
                 <div id="customer-register">
                     <h4 class="customer-register-labels">Login:</h4>
                     <input type="text" name="email" placeholder="Email" required/>
-                    <input type="password" name="password" placeholder="Password" required/></br>
-                    <h4 class="customer-register-labels">Name and Phone Number:</h4>
+                    <input type="password" name="password" placeholder="Password" required/>
+                    <input type="text" name="primary_phone_number" placeholder="Primary Phone Number" required/><br>
+                    <h4 class="customer-register-labels">Name and Date of Birth:</h4>
                     <input type="text" name="fname" placeholder="First Name" required/>
                     <input type="text" name="lname" placeholder="Last Name" required/>
-                    <input type="text" name="primary_phone_number" placeholder="Primary Phone Number" required/> </br>
+                    <input type="date" name="date_of_birth" placeholder="Date of Birth" required/> </br>
                     <h4 class="customer-register-labels">Address:</h4>
                     <input type="text" name="street" placeholder="Street" required/>
                     <input type="text" name="building_num" placeholder="Building Number" required/>
@@ -32,11 +32,9 @@
                     <input type="text" name="state" placeholder="State" required/>
                     <input type="text" name="zip_code" placeholder="Zip Code" required/> </br>
                     <h4 class="customer-register-labels">Passport Info:</h4>
-                    <h5><em>* First Date: Passport Exp Date, ** Second Date: Date of Birth</em></h5>
                     <input type="text" name="passport_number" placeholder="Passport Number" required/>
-                    <input type="date" name="passport_expiration_date" placeholder="Passport Expiration Date" required/>
                     <input type="text" name="passport_country" placeholder="Passport Country" required/>
-                    <input type="date" name="date_of_birth" placeholder="Date of Birth" required/> </br>
+                    <input type="date" name="passport_expiration_date" placeholder="Passport Expiration Date" required/> <br>
                     <input class="register-button" type="submit" value="Register"/>
         
                     {% if error %}

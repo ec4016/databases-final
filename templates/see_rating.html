@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>See Rating</title>
+</head>
+<body>
+<h2>The Average Rating of This Flight is {{average_rating}}/5</h2>
+<style type="text/css">
+	table, th, td{
+		border: 1px solid black;
+	}
+    </style>
+    <table>
+        <th>Comments</th>
+        {% for line in comments %}
+        <tr>
+            <td>{{line['comment']}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
