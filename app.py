@@ -1087,30 +1087,6 @@ def generate_tickets(capacity, airline_name, flight_num, departure_time):
 #         error = "Data inputted incorrectly."
 #         return render_template('staff_edit_flights.html', error=error)
 
-
-@app.route('/see_rating', methods=['POST'])
-def see_rating():
-    cursor = conn.cursor()
-    username = session['username']
-    flight_num = request.form['flight_num']
-    departure_date = request.form['departure_date']
-    departure_time = request.form['departure_time']
-    get_airline = 'SELECT airline_name FROM staff WHERE username=%s'
-    cursor.execute(get_airline, username)
-    data = cursor.fetchone()
-    airline = data['airline_name']
-    avg = 'SELECT AVG(rating) AS average_rating FROM flight_taken ' \
-          "WHERE airline_name = %s AND flight_num = %s AND departure_date = %s AND HOUR(departure_time) = HOUR(%s)"
-    cursor.execute(avg, (airline, flight_num, departure_date, departure_time))
-    data = cursor.fetchone()
-    average_rating = data['average_rating']
-    query = 'SELECT comment FROM Flight_Taken ' \
-            'WHERE airline_name = %s AND flight_num = %s AND departure_date = %s ' \
-            "AND HOUR(departure_time) = HOUR(%s) AND comment IS NOT NULL"
-    cursor.execute(query, (airline, flight_num, departure_date, departure_time))
-    comments = cursor.fetchall()
-    return render_template('see_rating.html', comments=comments, average_rating=average_rating)
-
 @app.route('/add_airplane_and_airport')
 def add_airplane_and_airport():
     return render_template('add_airplane_and_airport.html')
