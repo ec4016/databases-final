@@ -788,7 +788,7 @@ def staff_home():
 
 
 @app.route('/staffView', methods=['GET', 'POST'])
-def stafftView():
+def staffView():
     cursor = conn.cursor()
     params = request.form
     error = None
@@ -827,7 +827,7 @@ def stafftView():
 
     if not data:
         error = "There are no flights matching these parameters. Please try again!"
-        return render_template('guest.html', flightType=flightType, error=error)
+        return render_template('staff.html', flightType=flightType, error=error)
 
     cursor.close()
     return render_template('guest.html', flightType=flightType, error=error, results=data)
@@ -950,13 +950,25 @@ def maintenance():
     start_time = request.form['start_time']
     end_date = request.form['end_date']
     end_time = request.form['end_time']
+    check="SELECT * FROM airplane WHERE airline_name=%s AND airplane_id=%s"
+    cursor.execute(check,(airline,airplane_id))
+    exist=cursor.fetchone()
     maintenance_error = None
-    ins = 'INSERT IGNORE INTO maintenance (airline_name,airplane_id,start_date,start_time,end_date,end_time)' \
-          'VALUES (%s,%s,%s,%s,%s,%s)'
-
-    cursor.execute(ins, (airline, airplane_id, start_date, start_time, end_date, end_time))
-    conn.commit()
-    return render_template('staff_home.html')
+    if(exist):
+        ins = 'INSERT IGNORE INTO maintenance (airline_name,airplane_id,start_date,start_time,end_date,end_time)' \
+              'VALUES (%s,%s,%s,%s,%s,%s)'
+        cursor.execute(ins, (airline, airplane_id, start_date, start_time, end_date, end_time))
+        conn.commit()
+        update = "UPDATE flight SET status = 'Maintenance' " \
+                 "WHERE airplane_id=%s AND airline_name=%s departure_date BETWEEN %s AND %s"
+        cursor.execute(update, (airplane_id, airline, start_date, end_date))
+        conn.commit()
+        cursor.close()
+        return redirect(url_for('staff_home'))
+    else:
+        cursor.close()
+        maintenance_error="No Airplane Found"
+        return redirect(url_for('staff_home',maintenance_error=maintenance_error))
 
 
 @app.route('/search_customer', methods=['POST'])
@@ -1099,6 +1111,7 @@ def logout():
 
 @app.route('/staff_home')
 def staff_home():
+    maintenance_error=request.args.get('maintenance_error')
     username = session['username']
     cursor = conn.cursor();
     query = 'SELECT first_name from staff where username = %s'
@@ -1137,7 +1150,7 @@ def staff_home():
     print(month_revenue)
     return render_template('staff_home.html', username=username, flights=data,
                            name=customer_info['email'],ticket_num=ticket_num,year=year_revenue,month=month_revenue)
-
+    
 
 app.secret_key = 'some key that you will never guess'
 # Run the app on localhost port 5000
