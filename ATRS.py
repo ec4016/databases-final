@@ -647,11 +647,11 @@ def change_flight_status():
             cursor.close()
         else:
             change_error = "Flight has already taken off"
-            return render_template('', change_error=change_error, username=username,
+            return render_template('change_status.html', change_error=change_error, username=username,
                                    flights=flightdata)
     else:
         change_error = "Missing Field"
-        return render_template('', change_error=change_error, username=username, flights=flightdata)
+        return render_template('change_status.html', change_error=change_error, username=username, flights=flightdata)
 
 @app.route('/staff_new_airplane', methods=['POST'])
 def staff_new_airplane():

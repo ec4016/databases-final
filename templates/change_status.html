@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel = "stylesheet" href="static\styles.css"/>
+        <title>Change Flight Status</title>
+    </head>
+
+    <body>
+        <div>
+			<h1>
+				<img id="cloud1" src="static\cloud.jpg" width="200px">
+				My Spendings
+				<img id="airplane" src="static\airplane.png" width="200px">
+			</h1>
+		</div>
+
+        <div id="spendings-container">
+            
+            <table>
+
+            </table>
+
+            <div id="spending-filter">
+                <form action="/specific_spending" method="POST">
+                    <label for="airline_num">Airline Number:</label>
+                    <input type="text" id="airline_num" name="airline_num" placeholder="Enter airline number">
+                    
+                    <br>
+                
+                    <label for="flight_num">Flight Number:</label>
+                    <input type="text" id="flight_num" name="flight_num" placeholder="Enter flight number">
+                    <br>
+
+                    <button type="submit">Submit</button>
+                    
+                </form>
+            </div>
+        </div>
+        
+        <a id="back-button" href="customer_home">Go Back</a><br>
+    <body>
+</html>
