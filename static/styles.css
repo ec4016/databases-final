@@ -59,6 +59,7 @@ table, th, td{
 table {
     border-radius: 15px;
     padding: 5px;
+    margin-bottom: 20px;
 }
 
 th, td {
@@ -214,6 +215,7 @@ input[type=submit]:hover {
 
 #customer-links, #staff-links {
     padding-top: 50px;
+    padding-bottom: 50px;
     text-align: center;
 }
 .space {
@@ -308,7 +310,7 @@ input[type=submit]:hover {
     margin-bottom: 30px;
 }
 
-#book-flight {
+#book-flight, #see-reviews, #maintenance-filters, #customer-search {
     border: 1px solid black;
     border-radius: 15px;
     text-align: center;
@@ -316,10 +318,14 @@ input[type=submit]:hover {
     margin-bottom: 30px;
 }
 
-#see-reviews, #maintenance-filters, #customer-search {
+#new-flight {
     border: 1px solid black;
     border-radius: 15px;
     text-align: center;
-    padding-bottom: 40px;
-    margin-bottom: 30px;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
 }
+

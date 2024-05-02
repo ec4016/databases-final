@@ -2,7 +2,11 @@
 INSERT INTO airline (name) values ('Jet Blue'), ('British Airways'), ('Emirates'), ('American Airlines');
 
 /* b. At least two airports named "JFK" in NYC and "PVG" in Shanghai */
-insert into airport (code, name, city, country, num_terminals, type) values ('JFK', 'John F. Kennedy International Airport', 'New York', 'United States', 5, 'international'), ('PVG', 'Shanghai Pudong International Airport', 'Shanghai', 'China', 2, 'International'), ('LGW', 'London Gatwick Airport', 'London', 'United Kingdom', 2, 'International'), ('CMN', 'Casablanca Mohammed V International Airport', 'Casablanca', 'Morocco', 3, 'International');
+insert into airport (code, name, city, country, num_terminals, type) values 
+('JFK', 'John F. Kennedy International Airport', 'New York', 'United States', 5, 'international'), 
+('PVG', 'Shanghai Pudong International Airport', 'Shanghai', 'China', 2, 'International'), 
+('LGW', 'London Gatwick Airport', 'London', 'United Kingdom', 2, 'International'), 
+('CMN', 'Casablanca Mohammed V International Airport', 'Casablanca', 'Morocco', 3, 'International');
 
 /* c. Insert at least three customers with appropriate names and other attributes */
 INSERT INTO customer (email, first_name, last_name, password, building_num, street, apartment_num, city, state, zip_code, primary_phone_number, passport_number, passport_expiration_date, passport_country, date_of_birth) values ('ec4016@nyu.edu', 'Emil', 'Cheung', 'abc123', 2, 'Jay Street', 13, 'Brooklyn', 'NY', 11201, '123-456-7890', 1234567890, '2030-01-11', 'United States', '2001-1-11'), 
@@ -29,7 +33,8 @@ INSERT INTO flight (airline_name, flight_num, departure_date, departure_time, ar
 ('British Airways', '2', '2024-05-13', '08:15:00' , '2024-05-13', '14:10:00', 650, 'on-time', 747, 'JFK', 'LGW'),
 ('Emirates', '3', '2024-06-28', '11:58:00', '2024-06-29', '23:55:00', 1000, 'cancelled', 456, 'JFK', 'CMN'), 
 ('American Airlines', '4', '2024-06-28', '11:58:00', '2024-06-29', '23:55:00', 1000, 'on-time', 215, 'JFK', 'LGW')
-('Jet Blue', '5', '2025-05-30', '15:15:00' , '2025-05-30', '20:15:00', 300, 'on-time', 123, 'LGW', 'JFK');
+('Jet Blue', '5', '2025-05-30', '15:15:00' , '2025-05-30', '20:15:00', 300, 'on-time', 123, 'LGW', 'JFK'),
+('Jet Blue', '4', '2024-05-15', '15:15:00' , '2024-05-16', '20:15:00', 300, 'on-time', 123, 'PVG', 'JFK');
 
 /* g. Insert some tickets for corresponding flights and insert some purchase records (customers bought some tickets) */
 INSERT INTO ticket (ticket_id, flight_num, sold_price, first_name, last_name, date_of_birth, airline_name, departure_date, departure_time) VALUES 

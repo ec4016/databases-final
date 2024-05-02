@@ -16,54 +16,84 @@
 			</h1>
 		</div>
 	
-        <h2>Create New Flight</h2>
+        <div class="staff-flights">
+            <table>
+                <th>Airline</th>
+                <th>Flight Number</th>
+                <th>Airplane ID</th>
+                <th>Departure Date</th>
+                <th>Departure Time</th>
+                <th>Arrival Date</th>
+                <th>Arrival Time</th>
+                <th>Departure Airport</th>
+                <th>Arrival Airport</th>
+                <th>Base Price</th>
+                <th>Status</th>
+		
+		    {% for line in flights %}
+                <tr>
+                    <td>{{line['airline_name']}}</td>
+                    <td>{{line['flight_num']}}</td>
+                    <td>{{line['airplane_id']}}</td>
+                    <td>{{line['departure_date']}}</td>
+                    <td>{{line['departure_time']}}</td>
+                    <td>{{line['arrival_date']}}</td>
+                    <td>{{line['arrival_time']}}</td>
+                    <td>{{line['departure_airport']}}</td>
+                    <td>{{line['arrival_airport']}}</td>
+                    <td>{{line['base_price']}}</td>
+                    <td>{{line['status']}}</td>
+                </tr>
+            {% endfor %}
+            </table>
+        </div>
+        
         <form action="/staff_new_flight" method="post">
-            <label for="airline_name">Airline Name:</label>
-            <input type="text" id="airline_name" name="airline_name" placeholder="Enter airline name">
+            <div id="new-flight">
+                <h2>Create New Flight</h2>
+                <label for="airline_name">Airline Name:</label>
+                <input type="text" id="airline_name" name="airline_name" placeholder="Enter airline name" required>
+                <label for="flight_num">Flight Number:</label>
+                
+                <input type="text" id="flight_num" name="flight_num" placeholder="Enter flight number" required>
+                <label for="airplane_id">Airplane ID:</label>
+                <input type="text" id="airplane_id" name="airplane_id" placeholder="Enter airplane ID" required><br>
             
-            <br>
+                <label for="departure_date">Departure Date:</label>
+                <input type="date" id="departure_date" name="departure_date" placeholder="Enter departure date" required>
+
+                <label for="departure_time">Departure Time:</label>
+                <input type="time" id="departure_time" name="departure_time" placeholder="Enter departure time" required><br>
+                
+
+                <label for="arrival_date">Arrival Date:</label>
+                <input type="date" id="arrival_date" name="arrival_date" placeholder="Enter arrival date" required>
+                <label for="arrival_time">Arrival Time:</label>
+                <input type="time" id="arrival_time" name="arrival_time" placeholder="Enter arrival time" required><br>
+                
+                <label for="departure_airport">Departure Airport:</label>
+                <input type="text" id="departure_airport" name="departure_airport" placeholder="Enter departure airport" required>
+                <label for="arrival_airport">Arrival Airport:</label>
+                <input type="text" id="arrival_airport" name="arrival_airport" placeholder="Enter arrival airport" required>
+                <br>
+            
+                <label for="base_price">Base Price:</label>
+                <input type="text" id="base_price" name="base_price" placeholder="Enter base price" required>
+
+            
+                <label for="status">Status:</label>
+                <input type="text" id="status" name="status" placeholder="Enter status" required><br>
         
-            <label for="flight_num">Flight Number:</label>
-            <input type="text" id="flight_num" name="flight_num" placeholder="Enter flight number">
-            <br>
-        
-            <label for="departure_date">Departure Date:</label>
-            <input type="date" id="departure_date" name="departure_date" placeholder="Enter departure date">
-            <br>
-        
-            <label for="departure_time">Departure Time:</label>
-            <input type="time" id="departure_time" name="departure_time" placeholder="Enter departure time">
-            <br>
-        
-            <label for="arrival_date">Arrival Date:</label>
-            <input type="date" id="arrival_date" name="arrival_date" placeholder="Enter arrival date">
-            <br>
-        
-            <label for="arrival_time">Arrival Time:</label>
-            <input type="time" id="arrival_time" name="arrival_time" placeholder="Enter arrival time">
-            <br>
-        
-            <label for="base_price">Base Price:</label>
-            <input type="text" id="base_price" name="base_price" placeholder="Enter base price">
-            <br>
-        
-            <label for="status">Status:</label>
-            <input type="text" id="status" name="status" placeholder="Enter status">
-            <br>
-        
-            <label for="airplane_id">Airplane ID:</label>
-            <input type="text" id="airplane_id" name="airplane_id" placeholder="Enter airplane ID">
-            <br>
-        
-            <label for="departure_airport">Departure Airport:</label>
-            <input type="text" id="departure_airport" name="departure_airport" placeholder="Enter departure airport">
-            <br>
-        
-            <label for="arrival_airport">Arrival Airport:</label>
-            <input type="text" id="arrival_airport" name="arrival_airport" placeholder="Enter arrival airport">
-            <br>
-        
-            <button type="submit">Submit</button>
+                <input type="submit" value="Submit"/><br><br>
+                {% if error %}
+                <div class="error"><strong>Error:</strong> {{error}}</div>
+                {% else %}
+                <h4>{{msg}}</h4>
+                {% endif %}
+            </div>
+
+            
+
         </form>
 
 		<a id="back-button" href="staff_home">Go Back</a>
