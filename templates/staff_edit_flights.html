@@ -20,16 +20,17 @@
             <table>
                 <th>Airline</th>
                 <th>Flight Number</th>
-                <th>Plane ID</th>
+                <th>Airplane ID</th>
                 <th>Departure Date</th>
                 <th>Departure Time</th>
                 <th>Arrival Date</th>
                 <th>Arrival Time</th>
                 <th>Departure Airport</th>
                 <th>Arrival Airport</th>
+                <th>Base Price</th>
                 <th>Status</th>
-            
-            {% for line in flights %}
+		
+		    {% for line in flights %}
                 <tr>
                     <td>{{line['airline_name']}}</td>
                     <td>{{line['flight_num']}}</td>
@@ -40,6 +41,7 @@
                     <td>{{line['arrival_time']}}</td>
                     <td>{{line['departure_airport']}}</td>
                     <td>{{line['arrival_airport']}}</td>
+                    <td>{{line['base_price']}}</td>
                     <td>{{line['status']}}</td>
                 </tr>
             {% endfor %}

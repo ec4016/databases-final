@@ -951,7 +951,17 @@ def maintenance():
 
 @app.route('/staff_edit_flights')
 def staff_edit_flights():
-    return render_template('staff_edit_flights.html')
+    username = session['username']
+    cursor = conn.cursor()
+    getStaff = 'SELECT first_name, airline_name from staff where username=%s'
+    cursor.execute(getStaff, (username))
+    staff = cursor.fetchone()
+    fname = staff['first_name']
+    airline = staff['airline_name']
+    futureFlightsQuery = "select * from flight where airline_name = %s AND departure_date between CURRENT_DATE and DATE_ADD(CURRENT_DATE, INTERVAL 30 DAY)"
+    cursor.execute(futureFlightsQuery, airline)
+    flights = cursor.fetchall()
+    return render_template('staff_edit_flights.html', username=fname, flights=flights)
 
 @app.route('/staff_view_flights')
 
@@ -974,16 +984,10 @@ def createFlight():
     cursor = conn.cursor()
 
     getStaff = 'SELECT first_name, airline_name from staff where username=%s'
-    cursor.execute(getStaff, (username,))
+    cursor.execute(getStaff, (username))
     staff = cursor.fetchone()
     fname = staff['first_name']
     airline = staff['airline_name']
-
-    # gets flights operating the next 30 days
-    futureFlightsQuery = "select * from flight where airline_name = %s AND departure_date between CURRENT_DATE and DATE_ADD(CURRENT_DATE, INTERVAL 30 DAY)"
-    cursor.execute(futureFlightsQuery, airline)
-    flights = cursor.fetchall()
-    print(flights)
 
     # Check if the flight already exists
     cursor.execute("SELECT * FROM flight WHERE airline_name = %s AND flight_num = %s AND departure_date = %s AND departure_time = %s", (airline_name, flight_num, departure_date, departure_time))
@@ -1059,7 +1063,52 @@ def createFlight():
         return render_template('staff_edit_flights.html', username=fname, flights=flights, msg='Successfully added flight!')
         
 
+@app.route('/change_flight_status', methods=['GET'])
+def change_flight_status():
+    print(request.args)
+    status = request.args.get('status')
 
+    username = session['username']
+    airline_name = request.form['airline_num']
+    flight_num = request.form['flight_num']
+    #departure_date = request.form['departure_date']
+    #departure_time = request.form['departure_time']
+
+    cursor = conn.cursor()
+    query = 'SELECT flight_num FROM flight WHERE flight_num=%s'
+    cursor.execute(query, (username, flight_num))
+    data = cursor.fetchone()
+    change_error = None
+    
+    #cursor.execute(flights, username)
+    flightdata = cursor.fetchall()
+    if (data):
+        time_query = 'SELECT * FROM flight WHERE airline_name = %s AND flight_number = %s AND departure_date_time = %s'
+        cursor.execute(time_query, flight_num)
+        timedata = cursor.fetchone()
+        date = timedata['departure_date']
+        time = (datetime.min + timedata['departure_time']).time()
+
+        print(type(date), type(time))
+        print(time)
+        departure_date_time = datetime.combine(date, time)
+        now = datetime.now()
+        if ((departure_date_time - now) > timedelta(hours=0)):
+            update = """UPDATE Flight SET status=%s
+                    WHERE flight_num=%s
+                    AND flight_nim = %s
+                    AND departure_date = %s
+                    AND departure_time = %s"""
+            cursor.execute(update, flight_num)
+            conn.commit()
+            cursor.close()
+        else:
+            change_error = "Flight has already taken off"
+            return render_template('', change_error=change_error, username=username,
+                                   flights=flightdata)
+    else:
+        change_error = "Missing Field"
+        return render_template('', change_error=change_error, username=username, flights=flightdata)
 
 
 
